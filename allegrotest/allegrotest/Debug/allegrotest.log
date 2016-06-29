@@ -1,0 +1,4 @@
+﻿  main.cpp
+c:\users\mattias\documents\visual studio 2015\projects\allegrotest\allegrotest\crossroad.h(7): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
+  allegrotest.vcxproj -> C:\Users\Mattias\Documents\Visual Studio 2015\Projects\allegrotest\Debug\allegrotest.exe
+  allegrotest.vcxproj -> C:\Users\Mattias\Documents\Visual Studio 2015\Projects\allegrotest\Debug\allegrotest.pdb (Partial PDB)
