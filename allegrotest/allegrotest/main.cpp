@@ -110,9 +110,9 @@ int main(int argc, char **argv) {
 					al_draw_filled_circle(x * 40 + 20, y * 40, 2, al_map_rgb(0, 255, 0));
 				else
 					al_draw_filled_circle(x * 40, y * 40, 2, al_map_rgb(0, 255, 0));
-				//if ((x != XSIZE - 1 && x != 0 && y != YSIZE - 1)) {
+				if ((x != XSIZE - 1 && x != 0 && y != YSIZE - 1)) {
 					if (y % 2 == 1) {
-						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getEastNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->east->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
+						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getEastNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->east->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 3);
 						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * 40, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->southEast->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
 						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * 40, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * 40, (board.grid[x][y]->southWest->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
 					}
@@ -121,14 +121,15 @@ int main(int argc, char **argv) {
 						al_draw_line(board.grid[x][y]->coordinates.x * 40, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->southEast->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
 						al_draw_line(board.grid[x][y]->coordinates.x * 40, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * 40, (board.grid[x][y]->southWest->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
 					}
-				//}
+				}
 			}
 		}
 
 		
+		/*
 		if (key_ev.type == ALLEGRO_EVENT_KEY_DOWN) {
 			al_draw_filled_circle(500,400, 2, al_map_rgb(128, 128, 0));
-		}
+		}*/
 		if (key_ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 			break;
 		
@@ -140,8 +141,8 @@ int main(int argc, char **argv) {
 			mouse_y = temp.y;
 		}
 
-		al_draw_filled_circle(mouse_x, mouse_y, 8, al_map_rgb(255,255,255));
-		
+		al_draw_filled_circle(mouse_x, mouse_y, 8, al_map_rgb(255, 255, 255));
+
 		if (mouse_ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && !test) {
 			test = true;
 			if (clicked.x == -1) {
@@ -150,7 +151,6 @@ int main(int argc, char **argv) {
 			else {
 				
 				Point2D temp = board.calculate_closest_node(mouse_ev.mouse.x, mouse_ev.mouse.y);
-				fprintf(stderr, "first: %i %i\nsecond: %i %i\n", clicked.x, clicked.y, temp.x, temp.y);
 				std::queue<Crossroad*> paths;
 				board.findPath(board.grid[clicked.x][clicked.y], board.grid[temp.x][temp.y], &paths);
 
