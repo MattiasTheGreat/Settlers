@@ -21,7 +21,7 @@ Board::Board(int xSize, int ySize) {
 			Road *roadEast = new Road;
 			grid[x][y]->east = roadEast;
 			roadEast->start = grid[x][y];
-
+			roadEast->visited = false;
 			if (x == xSize - 1) {
 				roadEast->end = grid[0][y];
 				grid[0][y]->west = roadEast;
@@ -93,9 +93,10 @@ void Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* p
 			pathfinder->front()->visited = false;
 			pathfinder->pop();
 		}
-		pathfinder->push(start);
-		pathfinder->push(start->previous);
-		
+		if (start->previous != NULL){
+			pathfinder->push(start);
+			pathfinder->push(start->previous);
+		}	
 		start->previous = NULL;
 	}
 	else {
@@ -132,13 +133,14 @@ void Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* p
 		}
 
 		if (pathfinder->empty()) {
-			fprintf(stderr, "tomt\n");
 			return;
 			
 		}
 		Crossroad* current = pathfinder->front();
 		pathfinder->pop();
 		findPath(current, end, pathfinder);
+		if (pathfinder->empty())
+			return;
 		current->visited = false;
 		if (current == pathfinder->back()) {
 			pathfinder->push(current->previous);
@@ -149,11 +151,10 @@ void Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* p
 
 void Board::buildRoad(std::queue<Crossroad*> path) {
 	if (!path.empty()) {
+		
 		Crossroad* start = path.front();
 		path.pop();
 		while (!path.empty()) {
-			fprintf(stderr, " first %i %i\n", start->coordinates.x,start->coordinates.y);
-			fprintf(stderr, " target %i %i\n", path.front()->coordinates.x, path.front()->coordinates.y);
 			start->roadToNeighbour(path.front())->visited = true;
 			start = path.front();
 			path.pop();
