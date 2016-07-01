@@ -4,9 +4,11 @@ Abstract spec:
    Nätverksstöd:
      UDP med NAT stöd
    
+   
    Grafikmodul:
      Menu mode
      Ingame mode (ingame (man kan ju ha menyer ingame också (detta borde diskuteras nån annanstans(?))))
+   
    
    Spel-logik-modul:
      Units / Buildings 
@@ -16,8 +18,12 @@ Abstract spec:
      
      Resource pathfinding (vi vill ju motverka/ta bort trafikstockningar, lagringsplatser? (blandning S2 & S4))
      
+     Melee game mechanics
+      Win conditions (kan ett spel bli lika!?)
+      
    World Editor:
-     Verktyg för att skapa banor. Antar vi bara kör melee. Inga custom scripts, förutom available buildings.
+     Verktyg för att skapa banor. Antar vi bara kör melee. Inga custom scripts, förutom available buildings, maxpop.
+     Gruvor sinar?
       
    Mer?
      
