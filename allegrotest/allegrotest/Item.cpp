@@ -1,7 +1,7 @@
 #include "Item.h"
 
 Item::Item(){
-	type = nullItem;
+	type = NULLITEM;
 	path = 0;
 }
 

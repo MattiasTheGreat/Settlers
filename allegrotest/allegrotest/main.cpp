@@ -80,19 +80,19 @@ int main(int argc, char **argv) {
 
 	al_flip_display();
 
-
-	const int YSIZE = 10; //jämnt tal!
-	const int XSIZE = 10;
+	const int GRIDSIZE = 30;
+	const int YSIZE = 20; //jämnt tal!
+	const int XSIZE = 20;
 	Board board(XSIZE,YSIZE);
-
 	std::queue<Crossroad*> path;
-
+	bool tillsvidare = false;
 	int mouse_x = 0;
 	int mouse_y = 0;
 	Point2D clicked;
 	clicked.x = -1;
 	clicked.y = -1;
 	bool test = false;
+	PathType pathType = ROAD_PATH;
 	while (true){
 		ALLEGRO_EVENT key_ev;
 		ALLEGRO_EVENT disp_ev;
@@ -106,25 +106,32 @@ int main(int argc, char **argv) {
 
 		for (int x = 0; x < XSIZE; ++x) {
 			for (int y = 0; y < YSIZE; ++y) {
-				if(y % 2 == 1)
-					al_draw_filled_circle(x * 40 + 20, y * 40, 2, al_map_rgb(0, 255, 0));
-				else
-					al_draw_filled_circle(x * 40, y * 40, 2, al_map_rgb(0, 255, 0));
+				
 				if ((x != XSIZE - 1 && x != 0 && y != YSIZE - 1)) {
+					board.grid[x][y]->east->paintThySelf(GRIDSIZE);
+					board.grid[x][y]->southEast->paintThySelf(GRIDSIZE);
+					board.grid[x][y]->southWest->paintThySelf(GRIDSIZE);
+					/*
 					if (y % 2 == 1) {
-						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getEastNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->east->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 3);
-						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * 40, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->southEast->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * 40 + 20, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * 40, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * 40, (board.grid[x][y]->southWest->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
+						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getEastNeighbour()->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->getEastNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->east->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
+						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * GRIDSIZE, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southEast->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
+						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * GRIDSIZE, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southWest->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
 					}
 					else {
-						al_draw_line(board.grid[x][y]->coordinates.x * 40, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getEastNeighbour()->coordinates.x * 40, board.grid[x][y]->getEastNeighbour()->coordinates.y * 40,(board.grid[x][y]->east-> visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * 40, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * 40, (board.grid[x][y]->southEast->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * 40, board.grid[x][y]->coordinates.y * 40, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * 40 + 20, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * 40, (board.grid[x][y]->southWest->visited ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
-					}
+						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getEastNeighbour()->coordinates.x * GRIDSIZE, board.grid[x][y]->getEastNeighbour()->coordinates.y * GRIDSIZE,(board.grid[x][y]->east-> built ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
+						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southEast->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
+						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southWest->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
+					}*/
 				}
+				board.grid[x][y]->paintThySelf(GRIDSIZE);
+				/*
+				if (y % 2 == 1)
+					al_draw_filled_circle(x * GRIDSIZE + GRIDSIZE / 2, y * GRIDSIZE, 4,(board.grid[x][y]->constructed == EMPTY ? al_map_rgb(0, 128, 128) : al_map_rgb(128, 128, 0)));
+				else
+					al_draw_filled_circle(x * GRIDSIZE, y * GRIDSIZE, 4, (board.grid[x][y]->constructed == EMPTY ? al_map_rgb(0, 128, 128) : al_map_rgb(128, 128, 0)));
+				*/
 			}
 		}
-
 		
 		/*
 		if (key_ev.type == ALLEGRO_EVENT_KEY_DOWN) {
@@ -133,31 +140,58 @@ int main(int argc, char **argv) {
 		if (key_ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 			break;
 		
+		if (key_ev.keyboard.keycode == ALLEGRO_KEY_A && !tillsvidare) {
+			tillsvidare = true;
+			for (int x = 0; x < XSIZE; ++x)
+				for (int y = 0; y < YSIZE; ++y)
+					fprintf(stderr, "%i %i %i %i\n", x, y, board.grid[x][y]->visited, board.grid[x][y]->previous);
+		}
+		if (key_ev.keyboard.keycode == ALLEGRO_KEY_S)
+			tillsvidare = false;
+
+		if (key_ev.keyboard.keycode == ALLEGRO_KEY_W)
+			pathType = FREE_PATH;
+
+		if (key_ev.keyboard.keycode == ALLEGRO_KEY_Q)
+			pathType = ROAD_PATH;
+
 		if (disp_ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) 
 			break;
 		if (mouse_ev.type == ALLEGRO_EVENT_MOUSE_AXES || mouse_ev.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
-			Point2D temp = board.calculate_closest_coordinate(mouse_ev.mouse.x, mouse_ev.mouse.y);
+			Point2D temp = board.calculate_closest_coordinate(mouse_ev.mouse.x, mouse_ev.mouse.y,GRIDSIZE);
 			mouse_x = temp.x;
 			mouse_y = temp.y;
 		}
 
-		al_draw_filled_circle(mouse_x, mouse_y, 8, al_map_rgb(255, 255, 255));
+		if (key_ev.keyboard.keycode == ALLEGRO_KEY_R) {
+			for (int x = 0; x < XSIZE; ++x)
+				for (int y = 0; y < YSIZE; ++y) {
+					board.grid[x][y]->visited = false;
+					board.grid[x][y]->previous = NULL;
+				}
+		}
+
+		al_draw_filled_circle(mouse_x, mouse_y, 4, al_map_rgb(255, 255, 255));
 
 		if (mouse_ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && !test) {
 			test = true;
+			
 			if (clicked.x == -1) {
-				clicked = board.calculate_closest_node(mouse_ev.mouse.x,mouse_ev.mouse.y);
+				clicked = board.calculate_closest_node(mouse_ev.mouse.x,mouse_ev.mouse.y,GRIDSIZE);
+				fprintf(stderr, "%i %i %i\n", clicked.x, clicked.y, board.grid[clicked.x][clicked.y]->visited);
 			}
 			else {
 				
-				Point2D temp = board.calculate_closest_node(mouse_ev.mouse.x, mouse_ev.mouse.y);
+				Point2D temp = board.calculate_closest_node(mouse_ev.mouse.x, mouse_ev.mouse.y,GRIDSIZE);
+				fprintf(stderr, "%i %i %i\n", temp.x, temp.y, board.grid[temp.x][temp.y]->visited);
 				std::queue<Crossroad*> paths;
-				board.findPath(board.grid[clicked.x][clicked.y], board.grid[temp.x][temp.y], &paths);
+				board.findPath(board.grid[clicked.x][clicked.y], board.grid[temp.x][temp.y], &paths, pathType);
 
 				if(!paths.empty())
 					board.buildRoad(paths);
 				clicked.x = -1;
 			}
+			
 		}
 		if (mouse_ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 			test = false;

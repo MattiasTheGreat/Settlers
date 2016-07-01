@@ -1,6 +1,8 @@
 #pragma once
 #include "Item.h"
 
+enum BuildStatus {EMPTY, ROAD, FLAG, BUILDING};
+
 typedef struct Point2D {
 	int x;
 	int y;
@@ -12,8 +14,9 @@ class Crossroad {
 public:
 	Crossroad();
 
-	int hej;
+	BuildStatus constructed;
 	bool visited;
+	bool shifted;
 	Point2D coordinates;
 	Road *northEast;
 	Road *northWest;
@@ -36,5 +39,7 @@ public:
 	Crossroad *getNorthWestNeighbour();
 
 	Road *roadToNeighbour(Crossroad*);
+
+	void paintThySelf(int GRIDSIZE);
 
 };
