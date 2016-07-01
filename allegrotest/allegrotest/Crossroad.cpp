@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "Road.h"
 #include <stdio.h>
-
+#include <allegro5/allegro_primitives.h>
 
 Crossroad::Crossroad() {
 	
@@ -12,8 +12,9 @@ Crossroad::Crossroad() {
 		a->type = itemType::null;
 		items[i] = a;*/
 		items[i] = nullptr;
-
+		space[i] = false;
 	}
+	constructed = EMPTY;
 	visited = false;
 }
 
@@ -59,4 +60,18 @@ Road* Crossroad::roadToNeighbour(Crossroad* neighbour) {
 
 void Crossroad::name () {
 	fprintf(stderr, "Pos: (%i, %i) \n", this->coordinates.x, this->coordinates.y);
+}
+
+void Crossroad::paintThySelf( int GRIDSIZE) {
+	ALLEGRO_COLOR color;
+	if (constructed == EMPTY)
+		color = al_map_rgb(0, 128, 128);
+	else if (constructed == BUILDING)
+		color = al_map_rgb(128, 128, 0);
+	else
+		color = al_map_rgb(128, 0, 128);
+	if (coordinates.y % 2 == 1)
+		al_draw_filled_circle(coordinates.x * GRIDSIZE + GRIDSIZE / 2, coordinates.y * GRIDSIZE, 4, color);
+	else
+		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
 }

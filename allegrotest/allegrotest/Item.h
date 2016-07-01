@@ -1,5 +1,5 @@
 #pragma once
-enum itemType {nullItem,tree,planks};
+enum itemType {NULLITEM,TREE,PLANKS};
 
 class Item {
 public:
