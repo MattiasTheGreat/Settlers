@@ -10,6 +10,8 @@
 #include <queue>
 #include <sstream>
 #include "board.h"
+#include <thread>
+
 
 int main(int argc, char **argv) {
 
@@ -74,12 +76,12 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "Could not load 'pirulen.ttf'.\n");
 		return -1;
 	}
-
 	
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 
 	al_flip_display();
 
+	
 	const int GRIDSIZE = 30;
 	const int YSIZE = 20; //jämnt tal!
 	const int XSIZE = 20;
@@ -93,45 +95,20 @@ int main(int argc, char **argv) {
 	clicked.y = -1;
 	bool test = false;
 	PathType pathType = ROAD_PATH;
+	ALLEGRO_EVENT disp_ev;
+	ALLEGRO_EVENT mouse_ev;
+
 	while (true){
 		ALLEGRO_EVENT key_ev;
-		ALLEGRO_EVENT disp_ev;
-		ALLEGRO_EVENT mouse_ev;
+		
 		
 		al_get_next_event(keyboard_event_queue, &key_ev);
 		al_get_next_event(display_event_queue, &disp_ev);
 		al_get_next_event(mouse_event_queue, &mouse_ev);
 
 		al_clear_to_color(al_map_rgb(0, 0, 0));
-
-		for (int x = 0; x < XSIZE; ++x) {
-			for (int y = 0; y < YSIZE; ++y) {
-				
-				if ((x != XSIZE - 1 && x != 0 && y != YSIZE - 1)) {
-					board.grid[x][y]->east->paintThySelf(GRIDSIZE);
-					board.grid[x][y]->southEast->paintThySelf(GRIDSIZE);
-					board.grid[x][y]->southWest->paintThySelf(GRIDSIZE);
-					/*
-					if (y % 2 == 1) {
-						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getEastNeighbour()->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->getEastNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->east->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * GRIDSIZE, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southEast->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * GRIDSIZE, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southWest->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
-					}
-					else {
-						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getEastNeighbour()->coordinates.x * GRIDSIZE, board.grid[x][y]->getEastNeighbour()->coordinates.y * GRIDSIZE,(board.grid[x][y]->east-> built ? al_map_rgb(255, 0, 0) : al_map_rgb(0,0,255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthEastNeighbour()->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->getSouthEastNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southEast->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
-						al_draw_line(board.grid[x][y]->coordinates.x * GRIDSIZE, board.grid[x][y]->coordinates.y * GRIDSIZE, board.grid[x][y]->getSouthWestNeighbour()->coordinates.x * GRIDSIZE + GRIDSIZE/2, board.grid[x][y]->getSouthWestNeighbour()->coordinates.y * GRIDSIZE, (board.grid[x][y]->southWest->built ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 255)), 1);
-					}*/
-				}
-				board.grid[x][y]->paintThySelf(GRIDSIZE);
-				/*
-				if (y % 2 == 1)
-					al_draw_filled_circle(x * GRIDSIZE + GRIDSIZE / 2, y * GRIDSIZE, 4,(board.grid[x][y]->constructed == EMPTY ? al_map_rgb(0, 128, 128) : al_map_rgb(128, 128, 0)));
-				else
-					al_draw_filled_circle(x * GRIDSIZE, y * GRIDSIZE, 4, (board.grid[x][y]->constructed == EMPTY ? al_map_rgb(0, 128, 128) : al_map_rgb(128, 128, 0)));
-				*/
-			}
-		}
+		board.paintThySelf(GRIDSIZE);
+		
 		
 		/*
 		if (key_ev.type == ALLEGRO_EVENT_KEY_DOWN) {
@@ -202,7 +179,6 @@ int main(int argc, char **argv) {
 	al_destroy_display(display);
 	al_destroy_event_queue(display_event_queue);
 	al_destroy_event_queue(keyboard_event_queue);
-
 	return 0;
 }
 

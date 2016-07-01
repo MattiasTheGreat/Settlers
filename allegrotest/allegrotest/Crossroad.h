@@ -1,7 +1,6 @@
 #pragma once
 #include "Item.h"
-
-enum BuildStatus {EMPTY, ROAD, FLAG, BUILDING};
+#include "BuildStatus.h"
 
 typedef struct Point2D {
 	int x;

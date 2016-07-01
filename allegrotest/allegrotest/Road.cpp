@@ -5,7 +5,7 @@
 #include "Crossroad.h"
 
 Road::Road() {
-	built = false;
+	built = FREE;
 	progress = -1;
 }
 

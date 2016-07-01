@@ -8,6 +8,9 @@ enum PathType { ROAD_PATH, ITEM_PATH, FREE_PATH };
 class Board {
 public:
 	Board(int xSize, int ySize);
+
+	int xSize;
+	int ySize;
 	std::vector<std::vector<Crossroad*>> grid;
 
 	Point2D calculate_closest_node(int x, int y, int gridSize);
@@ -18,4 +21,7 @@ public:
 	void buildRoad(std::queue<Crossroad*> path);
 
 	bool pathCriteria(PathType type, Road* road, Crossroad* destination);
+
+	void paintThySelf(int GRIDSIZE);
+
 };

@@ -1,7 +1,6 @@
 #pragma once
 #include "Item.h"
-
-enum roadType {FREE, DISABLED, ROADie};
+#include "BuildStatus.h"
 
 class Crossroad;
 
@@ -14,7 +13,7 @@ public:
 	Item carried;
 	Crossroad *start;
 	Crossroad *end;
-	bool built;
+	BuildStatus built;
 
 	void paintThySelf(int GRIDSIZE);
 

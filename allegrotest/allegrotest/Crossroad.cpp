@@ -14,7 +14,7 @@ Crossroad::Crossroad() {
 		items[i] = nullptr;
 		space[i] = false;
 	}
-	constructed = EMPTY;
+	constructed = FREE;
 	visited = false;
 }
 
@@ -64,7 +64,7 @@ void Crossroad::name () {
 
 void Crossroad::paintThySelf( int GRIDSIZE) {
 	ALLEGRO_COLOR color;
-	if (constructed == EMPTY)
+	if (constructed == FREE)
 		color = al_map_rgb(0, 128, 128);
 	else if (constructed == BUILDING)
 		color = al_map_rgb(128, 128, 0);

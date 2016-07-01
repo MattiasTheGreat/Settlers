@@ -2,10 +2,13 @@
 #include "Road.h"
 #include <assert.h>
 #include <random>
+#include <thread>
 
 
 Board::Board(int xSize, int ySize) {
 	assert(ySize % 2 == 0);
+	this->xSize = xSize;
+	this-> ySize = ySize;
 	for (int x = 0; x < xSize; ++x) {
 		std::vector<Crossroad*> temp_vect = *(new std::vector<Crossroad*>);
 		
@@ -25,7 +28,6 @@ Board::Board(int xSize, int ySize) {
 			Road *roadEast = new Road;
 			grid[x][y]->east = roadEast;
 			roadEast->start = grid[x][y];
-			roadEast->built = false;
 			if (x == xSize - 1) {
 				roadEast->end = grid[0][y];
 				grid[0][y]->west = roadEast;
@@ -97,7 +99,7 @@ Board::Board(int xSize, int ySize) {
 bool Board::pathCriteria(PathType type, Road* way, Crossroad* destination) {
 	switch (type) {
 		case ROAD_PATH:
-			return !destination->visited && !way->built && destination->constructed == EMPTY;
+			return !destination->visited && !way->built && destination->constructed == FREE;
 			break;
 		case FREE_PATH:
 			return !destination->visited && destination->constructed != BUILDING;
@@ -160,22 +162,18 @@ void Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* p
 		}
 
 		if (pathfinder->empty()) {
-			fprintf(stderr, "tomt");
 			return;
-			
 		}
 		Crossroad* current = pathfinder->front();
 		pathfinder->pop();
 		findPath(current, end, pathfinder, pathType);
 
-		if (pathfinder->empty())
-			return;
-
-		current->visited = false;
-		if (current == pathfinder->back()) {
-			pathfinder->push(current->previous);
-			
+		if (!pathfinder->empty()) {	
+			if (current == pathfinder->back()) {
+				pathfinder->push(current->previous);
+			}
 		}
+		current->visited = false;
 		current->previous = NULL;
 	}
 }
@@ -185,9 +183,9 @@ void Board::buildRoad(std::queue<Crossroad*> path) {
 		
 		Crossroad* start = path.front();
 		path.pop();
-		start->constructed = ROAD;
+		start->constructed = BuildStatus::ROAD;
 		while (!path.empty()) {
-			start->roadToNeighbour(path.front())->built = true;
+			start->roadToNeighbour(path.front())->built = ROAD;
 			start = path.front();
 			start->constructed = ROAD;
 			path.pop();
@@ -224,4 +222,18 @@ Point2D Board::calculate_closest_node(int x, int y, int gridSize) {
 	else
 		point.x = ((int)(x / gridSize));
 	return point;
+}
+
+void Board::paintThySelf(int GRIDSIZE) {
+	for (int x = 0; x < xSize; ++x) {
+		for (int y = 0; y < ySize; ++y) {
+
+			if ((x != xSize - 1 && x != 0 && y != ySize - 1)) {
+				grid[x][y]->east->paintThySelf(GRIDSIZE);
+				grid[x][y]->southEast->paintThySelf(GRIDSIZE);
+				grid[x][y]->southWest->paintThySelf(GRIDSIZE);
+			}
+			grid[x][y]->paintThySelf(GRIDSIZE);
+		}
+	}
 }
