@@ -1,0 +1,26 @@
+Settlers 2:
+
+Abstract spec:
+   Nätverksstöd:
+     UDP med NAT stöd
+   
+   Grafikmodul:
+     Menu mode
+     Ingame mode (ingame (man kan ju ha menyer ingame också (detta borde diskuteras nån annanstans(?))))
+   
+   Spel-logik-modul:
+     Units / Buildings 
+       De kan dela HP/dyl templates. Eller vad det heter i cpp.
+       
+     Pathfinding (millitary units)
+     
+     Resource pathfinding (vi vill ju motverka/ta bort trafikstockningar, lagringsplatser? (blandning S2 & S4))
+     
+   World Editor:
+     Verktyg för att skapa banor. Antar vi bara kör melee. Inga custom scripts, förutom available buildings.
+      
+   Mer?
+     
+   
+  
+
