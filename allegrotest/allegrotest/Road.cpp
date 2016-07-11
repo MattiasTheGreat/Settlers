@@ -15,7 +15,7 @@ Crossroad *Road::opposite(Crossroad *base) {
 	else if (start == base)
 		return end;
 	else {
-		fprintf(stderr, "error");
+		fprintf(stderr, "ERROR, the input node was not a neighbour\n");
 		return end;
 		
 	}

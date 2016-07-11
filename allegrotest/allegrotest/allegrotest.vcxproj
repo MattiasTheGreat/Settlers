@@ -122,6 +122,7 @@
   <ItemGroup>
     <ClCompile Include="Crossroad.cpp" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Road.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="BuildStatus.h" />
     <ClInclude Include="Crossroad.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Road.h" />
   </ItemGroup>

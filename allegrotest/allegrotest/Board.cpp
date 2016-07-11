@@ -3,12 +3,17 @@
 #include <assert.h>
 #include <random>
 #include <thread>
+#include <allegro5/allegro_primitives.h>
 
 
 Board::Board(int xSize, int ySize) {
 	assert(ySize % 2 == 0);
+
+	running = true;
+	mouse = { -1, -1 };
 	this->xSize = xSize;
 	this-> ySize = ySize;
+
 	for (int x = 0; x < xSize; ++x) {
 		std::vector<Crossroad*> temp_vect = *(new std::vector<Crossroad*>);
 		
@@ -236,4 +241,13 @@ void Board::paintThySelf(int GRIDSIZE) {
 			grid[x][y]->paintThySelf(GRIDSIZE);
 		}
 	}
+	al_draw_filled_circle(mouse.x, mouse.y, 4, al_map_rgb(255, 255, 255));
+}
+
+bool Board::isGameRunning() {
+	return running;
+}
+
+void Board::setGameRunning(bool running) {
+	this->running = running;
 }
