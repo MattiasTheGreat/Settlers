@@ -1,3 +1,3 @@
 #pragma once
 
-enum BuildStatus {FREE, ROAD, FLAG, BUILDING };
+enum BuildStatus {FREE, ROAD, FLAG, BUILDING , PORTAL};

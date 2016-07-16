@@ -24,10 +24,12 @@ Crossroad *Road::opposite(Crossroad *base) {
 
 void Road::paintThySelf(int GRIDSIZE) {
 	ALLEGRO_COLOR color;
-	if (built)
-		color = al_map_rgb(255, 0, 0);
-	else
+	if (built == FREE)
 		color = al_map_rgb(0, 0, 255);
+	else if (built == PORTAL)
+		color = al_map_rgb(0, 255, 0);
+	else
+		color = al_map_rgb(255,0,0);
 	if (start->coordinates.y % 2 == 1) {
 		if(end->shifted)
 			al_draw_line(start->coordinates.x * GRIDSIZE + GRIDSIZE / 2, start->coordinates.y * GRIDSIZE, end->coordinates.x * GRIDSIZE + GRIDSIZE / 2, end->coordinates.y * GRIDSIZE, color, 1);

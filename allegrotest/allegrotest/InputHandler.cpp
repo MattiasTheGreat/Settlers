@@ -2,7 +2,7 @@
 #include <allegro5\allegro_primitives.h>
 
 
-Point2D InputHandler::clicked;
+
 Board *InputHandler::board;
 int InputHandler::GRIDSIZE;
 bool InputHandler::mouseButtonDown;
@@ -15,7 +15,6 @@ ALLEGRO_EVENT_QUEUE *InputHandler::mouse_event_queue;
 bool InputHandler::init(Board *gameBoard, int gridsize, ALLEGRO_DISPLAY *display) {
 	InputHandler::board = gameBoard;
 	InputHandler::GRIDSIZE = gridsize;
-	InputHandler::clicked = { -1, -1 };
 	InputHandler::mouseButtonDown = false;
 	InputHandler::pathType = ROAD_PATH;
 
@@ -70,20 +69,38 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 	if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && !mouseButtonDown) {
 		mouseButtonDown = true;
 
-		if (clicked.x == -1) {
-			clicked = board->calculate_closest_node(event.mouse.x, event.mouse.y, GRIDSIZE);
-			fprintf(stderr, "%i %i %i\n", clicked.x, clicked.y, board->grid[clicked.x][clicked.y]->visited);
+		if (board->buildingRoad == false) {
+			board->clicked = board->calculate_closest_node(event.mouse.x, event.mouse.y, GRIDSIZE);
+			
+			fprintf(stderr, "%i %i %i\n", board->clicked.x, board->clicked.y, board->grid[board->clicked.x][board->clicked.y]->visited);
+
+			board->buildingRoad = board->grid[board->clicked.x][board->clicked.y]->build(BuildStatus::FLAG);
+			if (!board->buildingRoad)
+				board->clicked.x = -1;
+		
 		}
 		else {
 
 			Point2D temp = board->calculate_closest_node(event.mouse.x, event.mouse.y, GRIDSIZE);
 			fprintf(stderr, "%i %i %i\n", temp.x, temp.y, board->grid[temp.x][temp.y]->visited);
 			std::queue<Crossroad*> paths;
-			board->findPath(board->grid[clicked.x][clicked.y], board->grid[temp.x][temp.y], &paths, pathType);
+			if (board->clicked == temp) {
+				if (board->grid[board->clicked.x][board->clicked.y]->build(BuildStatus::FLAG)) {
+					board->buildingRoad = false;
+					board->clicked.x = -1;
+				}
+				else
+					fprintf(stderr,"Det gack int!\n");
+			}
+			else {
+				fprintf(stderr,"%i\n",board->findPath(board->grid[board->clicked.x][board->clicked.y], board->grid[temp.x][temp.y], &paths, pathType));
+				board->clicked = temp;
+				board->buildingRoad = true;
+			}
 
 			if (!paths.empty())
 				board->buildRoad(paths);
-			clicked.x = -1;
+			
 		}
 
 	}

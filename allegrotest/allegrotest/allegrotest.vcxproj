@@ -136,6 +136,7 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="Point2D.h" />
     <ClInclude Include="Road.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

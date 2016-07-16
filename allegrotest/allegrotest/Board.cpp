@@ -9,8 +9,10 @@
 Board::Board(int xSize, int ySize) {
 	assert(ySize % 2 == 0);
 
+	buildingRoad = false;
 	running = true;
 	mouse = { -1, -1 };
+	clicked = { -1,-1 };
 	this->xSize = xSize;
 	this-> ySize = ySize;
 
@@ -101,85 +103,123 @@ Board::Board(int xSize, int ySize) {
 	}
 }
 
-bool Board::pathCriteria(PathType type, Road* way, Crossroad* destination) {
-	switch (type) {
-		case ROAD_PATH:
-			return !destination->visited && !way->built && destination->constructed == FREE;
-			break;
-		case FREE_PATH:
-			return !destination->visited && destination->constructed != BUILDING;
-			break;
-		case ITEM_PATH:
-			return !destination->visited && way->built;
-			break;
-		default:
-			return false;
+bool Board::pathCriteria(PathType type, Road* way, Crossroad* end, Crossroad* destination) {
+	if (!destination->visited) {
+		switch (type) {
+			case ROAD_PATH:
+				if (destination->constructed == FLAG) {
+					return end == destination;
+				}
+				else if (destination->constructed == FREE)
+					return way->built == FREE;// && destination->constructed == FREE;
+				else
+					return false;
+				break;
+			case FREE_PATH:
+				return !destination->visited && destination->constructed != BUILDING;
+				break;
+			case ITEM_PATH:
+				return !destination->visited && way->built;
+				break;
+			default:
+				return false;
+		}
 	}
-		
-	
+	return false;
 	
 }
 
-void Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
+int Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
+	if ((end->constructed == FREE || end->constructed == FLAG) && (start->constructed == FLAG || start->constructed == FREE || (start->constructed == ROAD && buildingRoad == true)) )
+		return breadthFirst(start, end, pathfinder, pathType);
+	else
+		return -1;
+
+}
+
+int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
+	//system("pause"); //DEBUG
 	if (start == end) {
 		while (!pathfinder->empty()) {
 			pathfinder->front()->visited = false;
 			pathfinder->front()->previous = NULL;
 			pathfinder->pop();
 		}
-		if (start->previous != NULL){
+		if (start->previous != NULL) {
 			pathfinder->push(start);
 			pathfinder->push(start->previous);
-		}	
+		}
 		start->previous = NULL;
+		return start->transportationCost();
 	}
+
 	else {
 
-		if (pathCriteria(pathType, start->east, start->getEastNeighbour())) {
+		if (pathCriteria(pathType, start->east, end, start->getEastNeighbour())) {
+			//fprintf(stderr, "E\n"); //DEBUG
+			//start->east->built = ROAD; //DEBUG
 			start->getEastNeighbour()->previous = start;
 			pathfinder->push(start->getEastNeighbour());
 			start->getEastNeighbour()->visited = true;
 		}
-		if (pathCriteria(pathType, start->west, start->getWestNeighbour())) {
-			start->getWestNeighbour()->previous = start;
-			pathfinder->push(start->getWestNeighbour());
-			start->getWestNeighbour()->visited = true;
-		}
-		if (pathCriteria(pathType, start->southEast, start->getSouthEastNeighbour())) {
+		if (pathCriteria(pathType, start->southEast, end, start->getSouthEastNeighbour())) {
+			//start->southEast->built = ROAD; //DEBUG
+			//fprintf(stderr, "SE\n"); //DEBUG
 			start->getSouthEastNeighbour()->previous = start;
 			pathfinder->push(start->getSouthEastNeighbour());
 			start->getSouthEastNeighbour()->visited = true;
 		}
-		if (pathCriteria(pathType, start->northEast, start->getNorthEastNeighbour())) {
-			start->getNorthEastNeighbour()->previous = start;
-			pathfinder->push(start->getNorthEastNeighbour());
-			start->getNorthEastNeighbour()->visited = true;
-		}
-		if (pathCriteria(pathType, start->southWest, start->getSouthWestNeighbour())) {
+		if (pathCriteria(pathType, start->southWest, end, start->getSouthWestNeighbour())) {
+			//start->southWest->built = ROAD; //DEBUG
+			//fprintf(stderr, "SW\n"); //DEBUG
 			start->getSouthWestNeighbour()->previous = start;
 			pathfinder->push(start->getSouthWestNeighbour());
 			start->getSouthWestNeighbour()->visited = true;
 		}
-		if (pathCriteria(pathType, start->northWest, start->getNorthWestNeighbour())) {
+		if (pathCriteria(pathType, start->west, end, start->getWestNeighbour())) {
+			//start->west->built = ROAD; //DEBUG
+			//fprintf(stderr, "W\n"); //DEBUG
+			start->getWestNeighbour()->previous = start;
+			pathfinder->push(start->getWestNeighbour());
+			start->getWestNeighbour()->visited = true;
+		}
+		if (pathCriteria(pathType, start->northWest, end, start->getNorthWestNeighbour())) {
+			//start->northWest->built = ROAD; //DEBUG
+			//fprintf(stderr, "NW\n"); //DEBUG
 			start->getNorthWestNeighbour()->previous = start;
 			pathfinder->push(start->getNorthWestNeighbour());
 			start->getNorthWestNeighbour()->visited = true;
 		}
+		if (pathCriteria(pathType, start->northEast, end, start->getNorthEastNeighbour())) {
+			//start->northEast->built = ROAD; //DEBUG
+			//fprintf(stderr, "NE\n"); //DEBUG
+			start->getNorthEastNeighbour()->previous = start;
+			pathfinder->push(start->getNorthEastNeighbour());
+			start->getNorthEastNeighbour()->visited = true;
+		}
+		
+		
 
 		if (pathfinder->empty()) {
-			return;
+			return -1;
 		}
+
+		paintThySelf(30);
+		al_flip_display();
 		Crossroad* current = pathfinder->front();
 		pathfinder->pop();
-		findPath(current, end, pathfinder, pathType);
+
+		int returnvalue = breadthFirst(current, end, pathfinder, pathType);
 
 		if (!pathfinder->empty()) {	
 			if (current == pathfinder->back()) {
 				pathfinder->push(current->previous);
+				returnvalue += current->transportationCost();
 			}
 		}
 		current->visited = false;
 		current->previous = NULL;
+		return returnvalue;
 	}
 }
 
@@ -188,11 +228,11 @@ void Board::buildRoad(std::queue<Crossroad*> path) {
 		
 		Crossroad* start = path.front();
 		path.pop();
-		start->constructed = BuildStatus::ROAD;
+		start->build(BuildStatus::ROAD);
 		while (!path.empty()) {
-			start->roadToNeighbour(path.front())->built = ROAD;
+			start->roadToNeighbour(path.front())->built = PORTAL;
 			start = path.front();
-			start->constructed = ROAD;
+			start->build(BuildStatus::ROAD);
 			path.pop();
 		}
 	}
@@ -230,6 +270,7 @@ Point2D Board::calculate_closest_node(int x, int y, int gridSize) {
 }
 
 void Board::paintThySelf(int GRIDSIZE) {
+	al_clear_to_color(al_map_rgb(0, 0, 0));
 	for (int x = 0; x < xSize; ++x) {
 		for (int y = 0; y < ySize; ++y) {
 
@@ -242,6 +283,8 @@ void Board::paintThySelf(int GRIDSIZE) {
 		}
 	}
 	al_draw_filled_circle(mouse.x, mouse.y, 4, al_map_rgb(255, 255, 255));
+	if (clicked.x != -1) 
+		al_draw_filled_circle(clicked.x*30 + (grid[clicked.x][clicked.y]->shifted ? 15:0), clicked.y*30, 6, al_map_rgb(255, 69, 0));
 }
 
 bool Board::isGameRunning() {

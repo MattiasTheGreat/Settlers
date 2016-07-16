@@ -1,11 +1,7 @@
 #pragma once
 #include "Item.h"
 #include "BuildStatus.h"
-
-typedef struct Point2D {
-	int x;
-	int y;
-};
+#include "Point2D.h"
 
 class Road;
 
@@ -39,6 +35,8 @@ public:
 
 	Road *roadToNeighbour(Crossroad*);
 
+	int transportationCost();
+	bool build(BuildStatus status);
 	void paintThySelf(int GRIDSIZE);
 
 };

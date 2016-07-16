@@ -8,7 +8,6 @@
 class InputHandler {
 public:
 	~InputHandler();
-	static Point2D clicked;
 	static Board *board;
 	static int GRIDSIZE;
 	static bool mouseButtonDown;

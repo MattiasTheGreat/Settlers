@@ -16,6 +16,7 @@ Crossroad::Crossroad() {
 	}
 	constructed = FREE;
 	visited = false;
+	numberOfItems = 2;
 }
 
 Crossroad* Crossroad::getEastNeighbour() {
@@ -68,10 +69,46 @@ void Crossroad::paintThySelf( int GRIDSIZE) {
 		color = al_map_rgb(0, 128, 128);
 	else if (constructed == BUILDING)
 		color = al_map_rgb(128, 128, 0);
+	else if (constructed == FLAG)
+		color = al_map_rgb(255, 0, 0);
 	else
 		color = al_map_rgb(128, 0, 128);
 	if (coordinates.y % 2 == 1)
 		al_draw_filled_circle(coordinates.x * GRIDSIZE + GRIDSIZE / 2, coordinates.y * GRIDSIZE, 4, color);
 	else
 		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
+}
+
+int Crossroad::transportationCost() {
+	return numberOfItems;
+}
+
+bool Crossroad::build(BuildStatus status) {
+	switch (status) {
+		case ROAD:
+			if (constructed == FREE) {
+				constructed = ROAD;
+				return true;
+			}
+			break;
+		case BUILDING:
+			constructed = BUILDING;
+			break;
+		case FLAG:
+			if (getEastNeighbour()->constructed != FLAG &&
+				getWestNeighbour()->constructed != FLAG &&
+				getSouthEastNeighbour()->constructed != FLAG &&
+				getSouthWestNeighbour()->constructed != FLAG &&
+				getNorthEastNeighbour()->constructed != FLAG &&
+				getNorthWestNeighbour()->constructed != FLAG &&
+				(constructed == FREE || constructed == FLAG || constructed == ROAD)) 
+			{
+				constructed = FLAG;
+				return true;
+			}
+			else
+				return false;
+			break;
+	}
+	return false;
 }
