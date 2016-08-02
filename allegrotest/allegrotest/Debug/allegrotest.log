@@ -1,5 +1,4 @@
-﻿  InputHandler.cpp
+﻿  Board.cpp
 c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\point2d.h(5): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
-c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\inputhandler.cpp(126): warning C4477: 'fprintf' : format string '%i' requires an argument of type 'int', but variadic argument 4 has type 'Crossroad *'
   allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\Debug\allegrotest.exe
   allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\Debug\allegrotest.pdb (Partial PDB)

@@ -11,6 +11,7 @@ public:
 
 	BuildStatus constructed;
 	bool visited;
+	bool pathing;
 	bool shifted;
 	Point2D coordinates;
 	Road *northEast;
@@ -23,8 +24,12 @@ public:
 	bool space[8];
 	int numberOfItems;
 	Crossroad *previous;
+	double distance;
+	
+	bool operator<(Crossroad* lhs);
 
 	void name();
+	void printInfo();
 
 	Crossroad *getSouthEastNeighbour();
 	Crossroad *getSouthWestNeighbour();
@@ -36,7 +41,10 @@ public:
 	Road *roadToNeighbour(Crossroad*);
 
 	int transportationCost();
+	double calculateDistance(Crossroad* other);
+
 	bool build(BuildStatus status);
 	void paintThySelf(int GRIDSIZE);
 
+	
 };

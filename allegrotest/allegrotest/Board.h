@@ -4,6 +4,7 @@
 #include <queue>
 
 enum PathType { ROAD_PATH, ITEM_PATH, FREE_PATH };
+struct test;
 
 class Board {
 public:
@@ -30,8 +31,19 @@ public:
 
 	bool pathCriteria(PathType type, Road* road, Crossroad* start, Crossroad* destination);
 
+	void removeRoad(Crossroad* node);
+
+	void deleteClicked();
+
 	void paintThySelf(int GRIDSIZE);
 private:
+	int aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossroad*, std::vector<Crossroad*>, test>* pathfinder, PathType criteria);
 	int breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType criteria);
 	bool running;
+};
+
+struct test {
+	bool operator()(const Crossroad* lhs, const Crossroad* rhs) {
+		return lhs->distance > rhs->distance;
+	}
 };

@@ -134,6 +134,7 @@
     <ClInclude Include="BuildStatus.h" />
     <ClInclude Include="Crossroad.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="fpsCounter.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Point2D.h" />

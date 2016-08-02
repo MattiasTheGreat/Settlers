@@ -59,5 +59,8 @@
     <ClInclude Include="Point2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fpsCounter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

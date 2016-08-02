@@ -3,20 +3,18 @@
 #include "Road.h"
 #include <stdio.h>
 #include <allegro5/allegro_primitives.h>
+#include <math.h>
 
 Crossroad::Crossroad() {
 	
 	for (int i = 0; i < 8; i++) {
-		/*item *a;
-		a = (item*) malloc(sizeof(item));
-		a->type = itemType::null;
-		items[i] = a;*/
 		items[i] = nullptr;
 		space[i] = false;
 	}
 	constructed = FREE;
 	visited = false;
-	numberOfItems = 2;
+	numberOfItems = 0;
+	distance = 0;
 }
 
 Crossroad* Crossroad::getEastNeighbour() {
@@ -65,26 +63,37 @@ void Crossroad::name () {
 
 void Crossroad::paintThySelf( int GRIDSIZE) {
 	ALLEGRO_COLOR color;
-	if (constructed == FREE)
+	if (pathing)
+		color = al_map_rgb(0, 0, 0);
+	else if (constructed == FREE)
 		color = al_map_rgb(0, 128, 128);
 	else if (constructed == BUILDING)
 		color = al_map_rgb(128, 128, 0);
 	else if (constructed == FLAG)
-		color = al_map_rgb(255, 0, 0);
+		color = al_map_rgb(0, 255, 0);
 	else
-		color = al_map_rgb(128, 0, 128);
+		color = al_map_rgb(255,0,0);
 	if (coordinates.y % 2 == 1)
 		al_draw_filled_circle(coordinates.x * GRIDSIZE + GRIDSIZE / 2, coordinates.y * GRIDSIZE, 4, color);
 	else
 		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
 }
 
+
+double Crossroad::calculateDistance(Crossroad* other) {
+	return sqrt(pow(this->coordinates.x - other->coordinates.x, 2) + pow(this->coordinates.y - other->coordinates.y, 2));
+}
+
+
 int Crossroad::transportationCost() {
-	return numberOfItems;
+	return numberOfItems + 1;
 }
 
 bool Crossroad::build(BuildStatus status) {
 	switch (status) {
+		case FREE:
+			constructed = FREE;
+			break;
 		case ROAD:
 			if (constructed == FREE) {
 				constructed = ROAD;
@@ -112,3 +121,24 @@ bool Crossroad::build(BuildStatus status) {
 	}
 	return false;
 }
+
+void Crossroad::printInfo() {
+	fprintf(stderr, "%i %i ", this->coordinates.x, this->coordinates.y);
+	if (constructed == FLAG)
+		fprintf(stderr, "FLAG ");
+	if (constructed == ROAD)
+		fprintf(stderr, "ROAD ");
+	if (constructed == FREE)
+		fprintf(stderr, "FREE ");
+	if (constructed == BUILDING)
+		fprintf(stderr, "BUILDING ");
+
+
+	fprintf(stderr, "\n");
+}
+
+bool Crossroad::operator<(Crossroad* lhs) {
+	fprintf(stderr, "%i %i\n", this->distance, lhs->distance);
+	return this->distance >= lhs->distance;
+}
+

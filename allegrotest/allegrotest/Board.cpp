@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "Road.h"
+#include "fpsCounter.h"	//BEAR
 #include <assert.h>
 #include <random>
 #include <thread>
@@ -103,6 +104,45 @@ Board::Board(int xSize, int ySize) {
 	}
 }
 
+void Board::removeRoad(Crossroad* node) {
+	node->printInfo();
+	if (node->constructed != FLAG) {
+		node->constructed = FREE;
+		fprintf(stderr, "second\n");
+		Road* east = node->roadToNeighbour(node->getEastNeighbour());
+		if (east->built == ROAD) {
+			east->built = FREE;
+			removeRoad(node->getEastNeighbour());
+		}
+		Road* southEast = node->roadToNeighbour(node->getSouthEastNeighbour());
+		if (southEast->built == ROAD) {
+			southEast->built = FREE;
+			removeRoad(node->getSouthEastNeighbour());
+		}
+		Road* southWest = node->roadToNeighbour(node->getSouthWestNeighbour());
+		if (southWest->built == ROAD) {
+			southWest->built = FREE;
+			removeRoad(node->getSouthWestNeighbour());
+		}
+		Road* west = node->roadToNeighbour(node->getWestNeighbour());
+		if (west->built == ROAD) {
+			west->built = FREE;
+			removeRoad(node->getWestNeighbour());
+		}
+
+		Road* northEast = node->roadToNeighbour(node->getNorthEastNeighbour());
+		if (northEast->built == ROAD) {
+			northEast->built = FREE;
+			removeRoad(node->getNorthEastNeighbour());
+		}
+		Road* northWest = node->roadToNeighbour(node->getNorthWestNeighbour());
+		if (northWest->built == ROAD) {
+			northWest->built = FREE;
+			removeRoad(node->getNorthWestNeighbour());
+		}
+	}
+}
+
 bool Board::pathCriteria(PathType type, Road* way, Crossroad* end, Crossroad* destination) {
 	if (!destination->visited) {
 		switch (type) {
@@ -116,10 +156,10 @@ bool Board::pathCriteria(PathType type, Road* way, Crossroad* end, Crossroad* de
 					return false;
 				break;
 			case FREE_PATH:
-				return !destination->visited && destination->constructed != BUILDING;
+				return destination->constructed != BUILDING;
 				break;
 			case ITEM_PATH:
-				return !destination->visited && way->built;
+				return way->built == ROAD;
 				break;
 			default:
 				return false;
@@ -129,27 +169,175 @@ bool Board::pathCriteria(PathType type, Road* way, Crossroad* end, Crossroad* de
 	
 }
 
+
+
 int Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
-	if ((end->constructed == FREE || end->constructed == FLAG) && (start->constructed == FLAG || start->constructed == FREE || (start->constructed == ROAD && buildingRoad == true)) )
-		return breadthFirst(start, end, pathfinder, pathType);
+
+	if ((end->constructed == FREE || end->constructed == FLAG) && (start->constructed == FLAG || (start->constructed == ROAD && buildingRoad == true))) {
+
+		clock_t start_time = clock();
+		//int return_value = breadthFirst(start, end, pathfinder, pathType);
+
+		
+
+		std::priority_queue<Crossroad*, std::vector<Crossroad*>,test> priority;
+		int return_value = aStarish(start, end, &priority, pathType);
+		fprintf(stderr, "ms %i \n", timeDiff_ms(start_time));
+
+		if (end->previous != NULL) {
+			Crossroad* current = end;
+			while (current != start) {
+				pathfinder->push(current);
+				Crossroad* temp = current->previous;
+				current->previous = NULL;
+				current = temp;
+			}
+			pathfinder->push(start);
+		}
+		return return_value;
+
+	}
+
 	else
 		return -1;
 
 }
 
-int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
-	//system("pause"); //DEBUG
-	if (start == end) {
+int Board::aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossroad*, std::vector<Crossroad*>, test>* pathfinder, PathType pathType) {
+
+	fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
+
+	if (start == end) { 
 		while (!pathfinder->empty()) {
-			pathfinder->front()->visited = false;
-			pathfinder->front()->previous = NULL;
+			Crossroad* temp = pathfinder->top();
+			temp->visited = false;
+			temp->previous = NULL;
 			pathfinder->pop();
 		}
-		if (start->previous != NULL) {
-			pathfinder->push(start);
-			pathfinder->push(start->previous);
+		//start->previous = NULL;
+		start->previous->pathing = true;
+		return start->transportationCost();
+	}
+
+	else {
+
+		Crossroad* east = start->getEastNeighbour();
+		if (pathCriteria(pathType, start->east, end, east)) {
+			/*start->east->built = ROAD; //DEBUG
+			system("pause"); //DEBUG
+			paintThySelf(30); //DEBUG 30 is current gridsize
+			al_flip_display(); //DEBUG*/
+			//fprintf(stderr, "E\n"); //DEBUG
+			
+			east->previous = start;
+			east->distance = east->calculateDistance(end);
+			pathfinder->push(east);
+			east->visited = true;
 		}
-		start->previous = NULL;
+		Crossroad* southEast = start->getSouthEastNeighbour();
+		if (pathCriteria(pathType, start->southEast, end, southEast)) {
+			/*start->southEast->built = ROAD; //DEBUG
+			system("pause"); //DEBUG
+			paintThySelf(30); //DEBUG 30 is current gridsize
+			al_flip_display(); //DEBUG*/
+			//fprintf(stderr, "SE\n"); //DEBUG
+			southEast->previous = start;
+			southEast->distance = southEast->calculateDistance(end);
+			pathfinder->push(southEast);
+			southEast->visited = true;
+		}
+		Crossroad* southWest = start->getSouthWestNeighbour();
+		if (pathCriteria(pathType, start->southWest, end,southWest)) {
+			/*start->southWest->built = ROAD; //DEBUG
+			system("pause"); //DEBUG
+			paintThySelf(30); //DEBUG 30 is current gridsize
+			al_flip_display(); //DEBUG*/
+			//fprintf(stderr, "SW\n"); //DEBUG
+			southWest->previous = start;
+			southWest->distance = southWest->calculateDistance(end);
+			pathfinder->push(southWest);
+			southWest->visited = true;
+		}
+		Crossroad* west = start->getWestNeighbour();
+		if (pathCriteria(pathType, start->west, end, west)) {
+			/*start->west->built = ROAD; //DEBUG
+			system("pause"); //DEBUG
+			paintThySelf(30); //DEBUG 30 is current gridsize
+			al_flip_display(); //DEBUG*/
+			//fprintf(stderr, "W\n"); //DEBUG
+			west->previous = start;
+			west->distance = west->calculateDistance(end);
+			pathfinder->push(west);
+			west->visited = true;
+		}
+		Crossroad* northWest = start->getNorthWestNeighbour();
+		if (pathCriteria(pathType, start->northWest, end, northWest)) {
+			/*start->northWest->built = ROAD; //DEBUG
+			system("pause"); //DEBUG
+			paintThySelf(30); //DEBUG 30 is current gridsize
+			al_flip_display(); //DEBUG*/
+			//fprintf(stderr, "NW\n"); //DEBUG
+			northWest->previous = start;
+			northWest->distance = northWest->calculateDistance(end);
+			pathfinder->push(northWest);
+			northWest->visited = true;
+		}
+		Crossroad* northEast = start->getNorthEastNeighbour();
+		if (pathCriteria(pathType, start->northEast, end, northEast)) {
+			/*start->northEast->built = ROAD; //DEBUG
+			system("pause"); //DEBUG
+			paintThySelf(30); //DEBUG 30 is current gridsize
+			al_flip_display(); //DEBUG*/
+			//fprintf(stderr, "NE\n"); //DEBUG
+			northEast->previous = start;
+			northEast->distance = northEast->calculateDistance(end);
+			pathfinder->push(northEast);
+			northEast->visited = true;
+		}
+
+
+
+		if (pathfinder->empty()) {
+			return -1;
+		}
+
+		//paintThySelf(30); //DEBUG
+		//al_flip_display(); //DEGUB
+		Crossroad* current = pathfinder->top();
+		pathfinder->pop();
+
+		int returnvalue = aStarish(current, end, pathfinder, pathType);
+
+		if (start->pathing) {
+			start->pathing = false;
+			if (start->previous != NULL)
+				start->previous->pathing = true;
+		}
+		else
+			start->previous = NULL;
+
+		current->visited = false;
+		return returnvalue;
+	}
+}
+
+int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
+	/*system("pause"); //DEBUG
+	paintThySelf(30); //DEBUG
+	al_flip_display(); //DEBUG*/
+
+	fprintf(stderr, "distance %i \n", (int) (start->calculateDistance(end)));
+
+	if (start == end) {
+		while (!pathfinder->empty()) {
+			Crossroad* temp = pathfinder->front();
+			temp->visited = false;
+			temp->previous = NULL;
+
+			pathfinder->pop();
+		}
+		//start->previous = NULL;
+		start->previous->pathing = true;
 		return start->transportationCost();
 	}
 
@@ -204,21 +392,22 @@ int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>
 			return -1;
 		}
 
-		paintThySelf(30);
-		al_flip_display();
+		//paintThySelf(30); //DEBUG
+		//al_flip_display(); //DEGUB
 		Crossroad* current = pathfinder->front();
 		pathfinder->pop();
 
 		int returnvalue = breadthFirst(current, end, pathfinder, pathType);
 
-		if (!pathfinder->empty()) {	
-			if (current == pathfinder->back()) {
-				pathfinder->push(current->previous);
-				returnvalue += current->transportationCost();
-			}
+		if (start->pathing) {
+			start->pathing = false;
+			if(start->previous != NULL)
+				start->previous->pathing = true;
 		}
+		else 
+			start->previous = NULL;
+
 		current->visited = false;
-		current->previous = NULL;
 		return returnvalue;
 	}
 }
@@ -230,7 +419,7 @@ void Board::buildRoad(std::queue<Crossroad*> path) {
 		path.pop();
 		start->build(BuildStatus::ROAD);
 		while (!path.empty()) {
-			start->roadToNeighbour(path.front())->built = PORTAL;
+			start->roadToNeighbour(path.front())->built = ROAD;
 			start = path.front();
 			start->build(BuildStatus::ROAD);
 			path.pop();
@@ -293,4 +482,15 @@ bool Board::isGameRunning() {
 
 void Board::setGameRunning(bool running) {
 	this->running = running;
+}
+
+void Board::deleteClicked(){
+	if (grid[clicked.x][clicked.y]->constructed == FLAG) {
+		grid[clicked.x][clicked.y]->build(FREE);
+		removeRoad(grid[clicked.x][clicked.y]);
+	}
+	else if (grid[clicked.x][clicked.y]->constructed == ROAD) {
+		removeRoad(grid[clicked.x][clicked.y]);
+	}
+
 }

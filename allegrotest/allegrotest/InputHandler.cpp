@@ -69,20 +69,12 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 	if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && !mouseButtonDown) {
 		mouseButtonDown = true;
 
-		if (board->buildingRoad == false) {
+		if (board->clicked.x == -1) {
 			board->clicked = board->calculate_closest_node(event.mouse.x, event.mouse.y, GRIDSIZE);
-			
-			fprintf(stderr, "%i %i %i\n", board->clicked.x, board->clicked.y, board->grid[board->clicked.x][board->clicked.y]->visited);
-
-			board->buildingRoad = board->grid[board->clicked.x][board->clicked.y]->build(BuildStatus::FLAG);
-			if (!board->buildingRoad)
-				board->clicked.x = -1;
-		
 		}
 		else {
 
 			Point2D temp = board->calculate_closest_node(event.mouse.x, event.mouse.y, GRIDSIZE);
-			fprintf(stderr, "%i %i %i\n", temp.x, temp.y, board->grid[temp.x][temp.y]->visited);
 			std::queue<Crossroad*> paths;
 			if (board->clicked == temp) {
 				if (board->grid[board->clicked.x][board->clicked.y]->build(BuildStatus::FLAG)) {
@@ -93,9 +85,13 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 					fprintf(stderr,"Det gack int!\n");
 			}
 			else {
-				fprintf(stderr,"%i\n",board->findPath(board->grid[board->clicked.x][board->clicked.y], board->grid[temp.x][temp.y], &paths, pathType));
-				board->clicked = temp;
-				board->buildingRoad = true;
+				if (board->findPath(board->grid[board->clicked.x][board->clicked.y], board->grid[temp.x][temp.y], &paths, pathType) != -1) {
+					board->clicked = temp;
+					board->buildingRoad = true;
+				}
+				else if (!board->buildingRoad) {
+					board->clicked = temp;
+				}
 			}
 
 			if (!paths.empty())
@@ -134,6 +130,17 @@ void InputHandler::handleKeyboard(ALLEGRO_EVENT event) {
 
 	if (event.keyboard.keycode == ALLEGRO_KEY_Q)
 		pathType = ROAD_PATH;
+
+	if (event.keyboard.keycode == ALLEGRO_KEY_E)
+		pathType = ITEM_PATH;
+
+	if (event.keyboard.keycode == ALLEGRO_KEY_T) {
+		if (board->clicked.x != -1) {
+			board->deleteClicked();
+			board->clicked.x = -1;
+		}
+
+	}
 
 	if (event.keyboard.keycode == ALLEGRO_KEY_R) {
 		for (int x = 0; x < board->xSize; ++x)

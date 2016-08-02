@@ -3,6 +3,8 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+
+
 #include <stack>
 #include "Crossroad.h"
 #include "Road.h"
@@ -12,6 +14,10 @@
 #include "board.h"
 #include <thread>
 #include "InputHandler.h"
+
+//bear
+#include <iostream>
+#include <Windows.h>
 
 int main(int argc, char **argv) {
 
@@ -54,8 +60,8 @@ int main(int argc, char **argv) {
 
 	
 	const int GRIDSIZE = 30;
-	const int YSIZE = 20; //jämnt tal!
-	const int XSIZE = 20;
+	const int YSIZE = 30; //jämnt tal!
+	const int XSIZE = 30;
 	Board board(XSIZE,YSIZE);
 
 	if (!InputHandler::init(&board, GRIDSIZE, display)) {
@@ -63,12 +69,17 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+
 	while (board.isGameRunning()){
 		
+
 		board.paintThySelf(GRIDSIZE);
+
 		InputHandler::handleInput();
 		
 		al_flip_display();
+		
+
 		
 	}
 	al_destroy_display(display);
