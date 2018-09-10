@@ -10,7 +10,7 @@ class Road {
 public:
 	Road();
 	int progress;
-	Item carried;
+	Item* carried;
 	Crossroad *start;
 	Crossroad *end;
 	BuildStatus built;

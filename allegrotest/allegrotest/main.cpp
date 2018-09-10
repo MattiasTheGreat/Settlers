@@ -14,6 +14,7 @@
 #include "board.h"
 #include <thread>
 #include "InputHandler.h"
+#include <time.h>
 
 //bear
 #include <iostream>
@@ -69,19 +70,17 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-
+	clock_t previous_time = clock();
 	while (board.isGameRunning()){
-		
-
-		board.paintThySelf(GRIDSIZE);
-
+		//Only update the screen at 60 fps.
+		if ( (1000 * (clock() - previous_time)) / CLOCKS_PER_SEC > 60) {
+			previous_time = clock();
+			board.tick(GRIDSIZE);
+		}
 		InputHandler::handleInput();
-		
 		al_flip_display();
-		
-
-		
 	}
+
 	al_destroy_display(display);
 	
 	return 0;
