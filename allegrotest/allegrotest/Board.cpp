@@ -6,6 +6,7 @@
 #include <thread>
 #include <allegro5/allegro_primitives.h>
 #include "Directions.h"
+#include "Path.h"
 
 
 Board::Board(int xSize, int ySize) {
@@ -269,6 +270,63 @@ int Board::aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossr
 	}
 }
 
+/*
+template <TraversibleEdge T>
+int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType pathType) {
+
+
+	fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
+
+	if (start == end) {
+		while (!pathfinder->empty()) {
+			Crossroad* temp = pathfinder->front();
+			temp->visited = false;
+			temp->previous = NULL;
+
+			pathfinder->pop();
+		}
+		//start->previous = NULL;
+		start->previous->pathing = true;
+		return start->transportationCost();
+	}
+
+	else {
+		const Directions directions[6] = { NORTH_WEST, NORTH_EAST, EAST, SOUTH_EAST, SOUTH_WEST, WEST };
+		for (int i = 0; i < 6; ++i) {
+			Crossroad *node = start->getNeighbour(directions[i]);
+			if (pathCriteria(pathType, start->roads[i], end, node)) {
+				//fprintf(stderr, "E\n"); //DEBUG
+				//start->east->built = ROAD; //DEBUG
+				node->previous = start;
+				pathfinder->push(node);
+				node->visited = true;
+			}
+		}
+
+		if (pathfinder->empty()) {
+			return -1;
+		}
+
+		//paintThySelf(30); //DEBUG
+		//al_flip_display(); //DEGUB
+		Crossroad* current = pathfinder->front();
+		pathfinder->pop();
+
+		int returnvalue = breadthFirst(current, end, pathfinder, pathType);
+
+		if (start->pathing) {
+			start->pathing = false;
+			if (start->previous != NULL)
+				start->previous->pathing = true;
+		}
+		else
+			start->previous = NULL;
+
+		current->visited = false;
+		return returnvalue;
+	}
+}*/
+
 int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
 	/*system("pause"); //DEBUG
 	paintThySelf(30); //DEBUG
@@ -328,16 +386,22 @@ int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>
 
 void Board::buildRoad(std::queue<Crossroad*> path) {
 	if (!path.empty()) {
-		
+		//Path* p = new Path();
+		//p->appendPath(path); //TODO: This is a slightly temporary fix, we might need to clone the path in a better way. Might also not want to do this here
+		//Carrier* carrier = new Carrier(p); 
 		Crossroad* start = path.front();
 		path.pop();
 		start->build(BuildStatus::ROAD);
+		Crossroad* previous = nullptr; //This thing with previous also feels kinda hacky, but we need it to get the direction that we're building. It shold also never be null, as a path should always have atleast two elements.
 		while (!path.empty()) {
 			start->roadToNeighbour(path.front())->built = ROAD;
+			previous = start;
 			start = path.front();
 			start->build(BuildStatus::ROAD);
 			path.pop();
 		}
+		
+		start->builtRoad(start->getDirectionToNeighbour(previous));
 	}
 }
 
@@ -395,6 +459,9 @@ void Board::paintThySelf(int GRIDSIZE) {
 	al_draw_filled_circle(mouse.x, mouse.y, 4, al_map_rgb(255, 255, 255));
 	if (clicked.x != -1) 
 		al_draw_filled_circle(clicked.x*30 + (grid[clicked.x][clicked.y]->shifted ? 15:0), clicked.y*30, 6, al_map_rgb(255, 69, 0));
+	for (int i = 0; i < carriers->size(); ++i) {
+		carriers->at(i)->paintThySelf(GRIDSIZE);
+	}
 }
 
 bool Board::isGameRunning() {

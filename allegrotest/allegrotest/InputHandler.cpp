@@ -82,8 +82,10 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 			if (board->clicked == newClick) { //If we clicked the same node again, try to build a flag and deselect node
 				if (board->grid[board->clicked.x][board->clicked.y]->build(BuildStatus::FLAG)) {
 					if (board->buildingRoad) {
-						Carrier* carrier = new Carrier(currentPath);
-						board->addCarrier(carrier);
+						if (currentPath->length() != 0) {
+							Carrier* carrier = new Carrier(currentPath);
+							board->addCarrier(carrier);
+						}
 						board->buildingRoad = false;
 						currentPath = NULL;
 					}
@@ -95,14 +97,14 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 					fprintf(stderr, "Det gack int!\n");
 				}
 			}
-			else { // If we clicked a new node, either try to build a path to the newly selected node and update currently selected node.
+			else { // If we clicked a new node, try to build a path to the newly selected node and update currently selected node.
 				if (board->findPath(board->grid[board->clicked.x][board->clicked.y], board->grid[newClick.x][newClick.y], &paths, pathType) != -1) {
 					board->clicked = newClick;
 					if (!board->buildingRoad) {
 						currentPath = new Path(); //TODO: Need to add this to a carrier or vice versa somehow.
 						board->buildingRoad = true; 
 					}
-					currentPath->appendQueue(paths);//TODO: This might be unsafe, is paths initialized at all times?
+					currentPath->appendPath(paths);//TODO: This might be unsafe, is paths initialized at all times?
 				}
 				else if (!board->buildingRoad) { // If we are not currently building a road, the newly clicked node should become selected node.
 					board->clicked = newClick;

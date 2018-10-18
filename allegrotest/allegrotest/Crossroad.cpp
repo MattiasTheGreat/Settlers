@@ -1,16 +1,11 @@
 #include "Crossroad.h"
+#include "StockPile.h"
 
 Crossroad::Crossroad() {
-	for (int i = 0; i < 8; i++) {
-		items[i] = nullptr;
-		space[i] = false;
-	}
-	full = false;
 	constructed = FREE;
 	visited = false;
-	numberOfItems = 0;
 	distance = 0;
-	leaveItemQueue = new std::queue<Carrier*>;
+	stockPile = new StockPile(this); //TODO: This might be a bit unnecesary overhead, but works. Might wanna consider when having one is necesary
 }
 
 Crossroad* Crossroad::getNeighbour(Directions direction) {
@@ -20,60 +15,49 @@ Crossroad* Crossroad::getNeighbour(Directions direction) {
 Road* Crossroad::roadToNeighbour(Crossroad* neighbour) {
 	if (neighbour == this->getNeighbour(Directions::EAST))
 		return this->roads[Directions::EAST];
+
 	if (neighbour == this->getNeighbour(Directions::WEST))
 		return this->roads[Directions::WEST];
+
 	if (neighbour == this->getNeighbour(Directions::SOUTH_EAST))
 		return this->roads[Directions::SOUTH_EAST];
+
 	if (neighbour == this->getNeighbour(Directions::NORTH_EAST))
 		return this->roads[Directions::NORTH_EAST];
+
 	if (neighbour == this->getNeighbour(Directions::SOUTH_WEST))
 		return this->roads[Directions::SOUTH_WEST];
+
 	if (neighbour == this->getNeighbour(Directions::NORTH_WEST))
 		return this->roads[Directions::NORTH_WEST];
+
 	return NULL;
 }
 
-void Crossroad::requestLeaveItem(Carrier* carrier) {
-	leaveItemQueue->push(carrier);
-	if (!full) {
-		getItem();
-	}
+Directions Crossroad::getDirectionToNeighbour(Crossroad* neighbour) {
+	if (neighbour == this->getNeighbour(Directions::EAST))
+		return Directions::EAST;
+
+	if (neighbour == this->getNeighbour(Directions::WEST))
+		return Directions::WEST;
+
+	if (neighbour == this->getNeighbour(Directions::SOUTH_EAST))
+		return Directions::SOUTH_EAST;
+
+	if (neighbour == this->getNeighbour(Directions::NORTH_EAST))
+		return Directions::NORTH_EAST;
+
+	if (neighbour == this->getNeighbour(Directions::SOUTH_WEST))
+		return Directions::SOUTH_WEST;
+
+	if (neighbour == this->getNeighbour(Directions::NORTH_WEST))
+		return Directions::NORTH_WEST;
+
+	fprintf(stderr, "Someone asked for directions to a non-neighbour!\n");
+	return EAST; // arbritrary. Should be fine, hopefully never gets here.
 }
 
-Item *Crossroad::giveItem(int i) {
-	Item* temp = items[i];
-	space[i] = false;
-	items[i] = NULL;
-	numberOfItems--;
-	if (leaveItemQueue->size() != 0){ //This should be efficient enough. There should only be someone in the waiting line when the crossroad has been full.
-		getItem();
-	}
-	full = false;
-	return temp;
-}
 
-void Crossroad::getItem() {
-	//Both these checks are more efficient if we do in the two cases where this function is called: when someone wants to leave an item, and when an item is taken from a full crossroad. But perhaps it might be safer to do it all here
-	//if (!full) { 
-		//if (leaveItemQueue->size() != 0) {
-			Item* item = leaveItemQueue->front()->giveItem();
-			leaveItemQueue->pop();
-			for (int i = 0; i < 8; ++i) {
-				if (space[i]) {
-					items[i] = item;
-					space[i] = true;
-					item->received();
-					numberOfItems++;
-					if (numberOfItems == 8) {
-						full = true;
-					}
-					//return true;
-				}
-			}
-		//}
-	//}
-	//return false;
-}
 
 void Crossroad::name () {
 	fprintf(stderr, "Pos: (%i, %i) \n", this->coordinates.x, this->coordinates.y);
@@ -108,7 +92,11 @@ double Crossroad::calculateDistance(Crossroad* other) {
 
 
 int Crossroad::transportationCost() {
-	return numberOfItems + 1;
+	if (constructed == FLAG) {
+		return stockPile->numberOfItems + 1;
+	}
+	else
+		return 0;
 }
 
 bool Crossroad::build(BuildStatus status) {
@@ -164,3 +152,10 @@ bool Crossroad::operator<(Crossroad* lhs) {
 	return this->distance >= lhs->distance;
 }
 
+void Crossroad::builtRoad(Directions dir) {
+	//stockPile->addCarrier(dir);
+}
+
+void builtRoad(Carrier* carrier) {
+	carrier = carrier;
+}

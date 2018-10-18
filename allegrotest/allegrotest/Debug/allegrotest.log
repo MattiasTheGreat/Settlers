@@ -1,4 +1,6 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (settlers.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Connection.cpp
+  Carrier.cpp
+c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\carrier.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\point2d.h(5): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
   allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\Debug\allegrotest.exe
   allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\Debug\allegrotest.pdb (Partial PDB)

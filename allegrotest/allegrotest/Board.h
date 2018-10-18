@@ -51,6 +51,9 @@ private:
 
 	int aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossroad*, std::vector<Crossroad*>, test>* pathfinder, PathType criteria);
 	int breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType criteria);
+
+	//template <TraversibleEdge T>
+	//int breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType criteria);
 	bool running;
 };
 

@@ -10,10 +10,13 @@
 #include <math.h>
 #include "Carrier.h"
 #include <queue>
+#include "Order.h"
+#include "TraversibleNode.h"
 
 class Road;
+class StockPile;
 
-class Crossroad {
+class Crossroad : TraversibleNode {
 public:
 	Crossroad();
 
@@ -23,14 +26,11 @@ public:
 	bool shifted; // Defines wether this node is to be shifted on paint or not. The shift is to make the grid seem hexagonal.
 	Point2D coordinates; // Where the node is in the grid
 	Road *roads[6]; // All roads connecting to this node.
-	Carrier* carriers[6]; // All carriers connecting to this node. Might be null.
-	Item *items[8]; // The items currently on the crossroad.
-	bool space[8]; // Keeps track of which slots are taken by items. False if slot i is empty, true if there is an item.
-	bool full; // True whenever there is no space left.
-	std::queue<Carrier*>* leaveItemQueue; //Carriers have to stand in line to leave an item. Thisis done through requestLeaveItem().
-	int numberOfItems;
+	Carrier* carrier;
+
 	Crossroad *previous;
 	double distance;
+	StockPile* stockPile;
 	
 	bool operator<(Crossroad* lhs);
 
@@ -39,9 +39,7 @@ public:
 	
 	Crossroad *getNeighbour(Directions direction);
 	Road *roadToNeighbour(Crossroad*);
-
-	void requestLeaveItem(Carrier* carrier);
-	Item *giveItem(int i);
+	Directions getDirectionToNeighbour(Crossroad* neighbour);
 
 	int transportationCost();
 	double calculateDistance(Crossroad* other);
@@ -49,7 +47,7 @@ public:
 	bool build(BuildStatus status);
 	void paintThySelf(int GRIDSIZE);
 
-private:
-	void getItem();
-	
+	void builtRoad(Directions dir);
+	void builtRoad(Carrier* carrier);
+
 };

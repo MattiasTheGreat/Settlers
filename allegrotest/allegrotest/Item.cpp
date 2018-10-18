@@ -2,23 +2,8 @@
 
 
 
-Item::Item(std::vector<Crossroad*> path){
+Item::Item(){
 	type = NULLITEM;
-	this->path = path;
-	currentLocation = path.size();
-}
-
-void Item::received() {
-	removeStep();
-}
-
-void Item::removeStep()
-{
-	currentLocation--;
-}
-
-Crossroad *Item::nextCrossroad() {
-	return path.at(currentLocation);
 }
 
 void Item::paintThyself(int GRIDSIZE, Point2D coordinates) {

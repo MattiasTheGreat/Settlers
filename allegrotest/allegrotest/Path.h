@@ -8,9 +8,17 @@ public:
 	Path();
 	~Path();
 
-	std::queue<Crossroad*>* path;
+	Crossroad* getNode(int index);
+	Crossroad* getStart();
+	Crossroad* getEnd();
+	Crossroad* getNextNode(Crossroad* crossroad);
+	Crossroad* getPreviousNode(Crossroad* crossroad);
+	int length();
+	
 
-	void appendQueue(std::queue<Crossroad*> appender); // Destructive, so we want a copy of appender.
+	void appendPath(std::queue<Crossroad*> appender); // Destructive, so we want a copy of the parameter appender.
 
+private:
+	std::vector<Crossroad*>* path;
 };
 

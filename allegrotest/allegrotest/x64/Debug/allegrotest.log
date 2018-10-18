@@ -1,0 +1,5 @@
+﻿  Carrier.cpp
+c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\carrier.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\point2d.h(5): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
+  allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\x64\Debug\allegrotest.exe
+  allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\x64\Debug\allegrotest.pdb (Partial PDB)
