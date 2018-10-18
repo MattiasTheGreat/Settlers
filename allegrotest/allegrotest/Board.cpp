@@ -15,7 +15,7 @@ Board::Board(int xSize, int ySize) {
 	buildingRoad = false;
 	running = true;
 	mouse = { -1, -1 };
-	clicked = { -1,-1 };
+	selected = { -1,-1 };
 	this->xSize = xSize;
 	this-> ySize = ySize;
 	carriers = new std::vector<Carrier*>;
@@ -158,11 +158,14 @@ bool Board::pathCriteria(PathType type, Road* way, Crossroad* end, Crossroad* de
 	if (!destination->visited) {
 		switch (type) {
 			case ROAD_PATH:
-				if (destination->constructed == FLAG) {
-					return end == destination;
+				if (way->built == FREE) {
+					if (destination->constructed == FLAG) {
+						return end == destination;
+					}
+					else {
+						return destination->constructed == FREE;
+					}
 				}
-				else if (destination->constructed == FREE)
-					return way->built == FREE;// && destination->constructed == FREE;
 				else
 					return false;
 				break;
@@ -457,8 +460,8 @@ void Board::paintThySelf(int GRIDSIZE) {
 		}
 	}
 	al_draw_filled_circle(mouse.x, mouse.y, 4, al_map_rgb(255, 255, 255));
-	if (clicked.x != -1) 
-		al_draw_filled_circle(clicked.x*30 + (grid[clicked.x][clicked.y]->shifted ? 15:0), clicked.y*30, 6, al_map_rgb(255, 69, 0));
+	if (selected.x != -1) 
+		al_draw_filled_circle(selected.x*30 + (grid[selected.x][selected.y]->shifted ? 15:0), selected.y*30, 6, al_map_rgb(255, 69, 0));
 	for (int i = 0; i < carriers->size(); ++i) {
 		carriers->at(i)->paintThySelf(GRIDSIZE);
 	}
@@ -473,12 +476,12 @@ void Board::setGameRunning(bool running) {
 }
 
 void Board::deleteClicked(){
-	if (grid[clicked.x][clicked.y]->constructed == FLAG) {
-		grid[clicked.x][clicked.y]->build(FREE);
-		removeRoad(grid[clicked.x][clicked.y]);
+	if (grid[selected.x][selected.y]->constructed == FLAG) {
+		grid[selected.x][selected.y]->build(FREE);
+		removeRoad(grid[selected.x][selected.y]);
 	}
-	else if (grid[clicked.x][clicked.y]->constructed == ROAD) {
-		removeRoad(grid[clicked.x][clicked.y]);
+	else if (grid[selected.x][selected.y]->constructed == ROAD) {
+		removeRoad(grid[selected.x][selected.y]);
 	}
 
 }

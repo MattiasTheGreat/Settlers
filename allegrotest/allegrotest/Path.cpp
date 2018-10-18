@@ -12,10 +12,20 @@ Path::~Path() {
 	delete path;
 }
 
-void Path::appendPath(std::queue<Crossroad*> appender) {
-	while(!appender.empty()){
-		path->push_back(appender.front());
+void Path::addToPath(std::queue<Crossroad*> appender, bool continueBuilding) {
+	std::stack<Crossroad*> intermediary = std::stack<Crossroad*>();
+
+	while (!appender.empty()) {
+		intermediary.push(appender.front());
 		appender.pop();
+	}
+
+	if(continueBuilding)
+		intermediary.pop(); //The pathbuilder always adds the start node which is already in the path as it was added as the ending node before, so we need to remove it as to not have it twice in a row. Might want to consider if appender should be vector
+
+	while(!intermediary.empty()){
+		path->push_back(intermediary.top());
+		intermediary.pop();
 	}
 }
 

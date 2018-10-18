@@ -20,7 +20,7 @@ public:
 	int xSize;
 	int ySize;
 	Point2D mouse; // The node which is currently closest to the mouse. Will be highlighted.
-	Point2D clicked; // The currently targeted crossroad on the map. Value of -1 means nothing targeted atm.
+	Point2D selected; // The currently targeted crossroad on the map. Value of -1 means nothing targeted atm.
 	
 	std::vector<std::vector<Crossroad*>> grid;
 

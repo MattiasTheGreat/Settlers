@@ -77,14 +77,16 @@ void Carrier::advanceGoal() {
 		order->moved(); // Might eventually not want to do this every advanceGoal depending on what path the order is keeping.
 	}
 	
-	if (currentGoal == start) {
-		currentLocation = path->getPreviousNode(currentLocation);
-	}
-	else if(currentGoal == end) {
+
+	if (currentGoal == end) { //The order between these two does funnily enough matter. In the case of a path with the same end and start node, getNextNode will return a next node, while getPreviousNode will return the start node.
 		currentLocation = path->getNextNode(currentLocation);
 	}
+	else if (currentGoal == start) {
+		currentLocation = path->getPreviousNode(currentLocation);
+	}
+	
 	else {
-		throw std::logic_error("Peddler tried to advance while goal being neither end nor start");
+		throw std::logic_error("Peddler tried to advance while goal being neither end nor start. Unlogical :P");
 	}
 }
 
