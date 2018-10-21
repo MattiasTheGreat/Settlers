@@ -17,9 +17,13 @@ Carrier::Carrier(Path* path)
 	//TODO: This is temp initialization parameters, should be changed later probably
 	currentLocation = start;
 	currentGoal = end;
-	waiting = false;
+	waitLocation = end;
+	waiting = true;
 	carrying = false;
-	progress = 0;
+	progress = 1;
+	returning = false;
+	idle = false;
+	direction = Travel_Direction::ENDWARD;
 }
 
 
@@ -29,9 +33,11 @@ void Carrier::takeOrder() {
 		//carrying = true;
 		if (currentGoal == start) {
 			currentGoal = end;
+			direction = Travel_Direction::ENDWARD;
 		}
 		else if (currentGoal == end) {
 			currentGoal = start;
+			direction = Travel_Direction::STARTWARD;
 		}
 	/*}
 	else {
@@ -40,13 +46,16 @@ void Carrier::takeOrder() {
 }
 
 void Carrier::tick() {
-	if (!waiting) {
+	if (!idle) {
 		moveTowardsGoal();
 	}
 }
 
 void Carrier::arrive() {
-	if (carrying) {
+	if (waiting) {
+
+	}
+	else if (carrying) {
 		currentGoal->stockPile->requestLeaveOrder(this);
 	}
 	else {
@@ -55,38 +64,41 @@ void Carrier::arrive() {
 }
 
 void Carrier::moveTowardsGoal() {
-	if (progress == FINISHED) {
+	if (progress == FINISHED || progress == 0) {
 		advanceGoal();
 		if (currentLocation == currentGoal) {
-			if (currentGoal == end)
-				pickUpNode = path->getPreviousNode(end);
-			if (currentGoal == start)
-				pickUpNode = path->getNextNode(start);
 			arrive();
 		}
-		progress = 0;
+		progress = 1;
 	}
 	else {
-		++progress;
+		if (returning) {
+			--progress;
+		}
+		else {
+			++progress;
+		}
+		
 	}
 	fprintf(stderr, "Current Progress: %i \n", progress);
 }
 
 void Carrier::advanceGoal() {
 	if (carrying){
-		order->moved(); // Might eventually not want to do this every advanceGoal depending on what path the order is keeping.
+		order->moved(); // Might eventually not want to do this every advanceGoal depending on what path the order is keeping (Crossroads or Carriers).
 	}
-	
 
-	if (currentGoal == end) { //The order between these two does funnily enough matter. In the case of a path with the same end and start node, getNextNode will return a next node, while getPreviousNode will return the start node.
+	if (direction == Travel_Direction::ENDWARD) {
 		currentLocation = path->getNextNode(currentLocation);
 	}
-	else if (currentGoal == start) {
+	else if (direction == Travel_Direction::STARTWARD) {
 		currentLocation = path->getPreviousNode(currentLocation);
 	}
-	
 	else {
-		throw std::logic_error("Peddler tried to advance while goal being neither end nor start. Unlogical :P");
+		idle = true;
+	}
+	if (waiting & currentLocation == waitLocation) {
+		idle = true;
 	}
 }
 
@@ -97,9 +109,20 @@ Order* Carrier::giveOrder() {
 	return temp;
 }
 
+void Carrier::goToIdle(){ //TODO: Consider if we want to set currentGoal to waitLocation instead of this...
+	direction = path->directionToCrossroad(currentLocation, waitLocation);
+	if (direction = Travel_Direction::STAY) {
+		returning = true;
+	}
+	if (direction = Travel_Direction::UNREACHABLE) {
+		idle = true;
+	}
+}
+
 void Carrier::paintThySelf(int GRIDSIZE) {
 	ALLEGRO_COLOR color = al_map_rgb(125, 125, 255);
 	Crossroad* nextNode = currentLocation; //This is ugly, but will probably be fixed if i ever make a direction variable to solve all the currentGoal == end || start if-else things
+
 	if (currentGoal == end) {
 		nextNode = path->getNextNode(currentLocation);
 	}
@@ -110,40 +133,33 @@ void Carrier::paintThySelf(int GRIDSIZE) {
 	
 	float y1 = nextNode->coordinates.y * GRIDSIZE;
 	float y2 = currentLocation->coordinates.y * GRIDSIZE;
+	float x1 = 0;
+	float x2 = 0;
+	float x = 0;
+	float y = 0;
 
-	if (currentLocation->coordinates.y % 2 == 1) {
-		float x2 = currentLocation->coordinates.x * GRIDSIZE + GRIDSIZE / 2;
+	if (currentLocation->shifted) {
+		x2 = currentLocation->coordinates.x * GRIDSIZE + GRIDSIZE / 2;
 		if (nextNode->shifted) {
-			float x1 = nextNode->coordinates.x * GRIDSIZE + GRIDSIZE / 2;
-
-			al_draw_line(x1, y1, x2, y2, color, 1);
-			al_draw_filled_circle(progress * x1 / FINISHED + (FINISHED - progress) * x2 / FINISHED, progress * y1 / FINISHED + (FINISHED - progress) * y2 / FINISHED, 4, color);
-			
+			x1 = nextNode->coordinates.x * GRIDSIZE + GRIDSIZE / 2;
 		}
 		else {		
-			float x1 = nextNode->coordinates.x * GRIDSIZE;
-
-			al_draw_line(x1, y1, x2, y2, color, 1);
-			al_draw_filled_circle(progress * x1 / FINISHED + (FINISHED - progress) * x2 / FINISHED, progress * y1 / FINISHED + (FINISHED - progress) * y2 / FINISHED, 4, color);
+			x1 = nextNode->coordinates.x * GRIDSIZE;
 		}
 			
 	}
 	else {
-		float x2 = currentLocation->coordinates.x * GRIDSIZE;
+		x2 = currentLocation->coordinates.x * GRIDSIZE;
 		if (nextNode->shifted) {
-			float x1 = nextNode->coordinates.x * GRIDSIZE + GRIDSIZE / 2;
-			
-			al_draw_line(x1, y1, x2, y2, color, 1);
-			al_draw_filled_circle(progress * x1 / FINISHED + (FINISHED - progress) * x2 / FINISHED, progress * y1 / FINISHED + (FINISHED - progress) * y2 / FINISHED, 4, color);
-		}
-			
+			x1 = nextNode->coordinates.x * GRIDSIZE + GRIDSIZE / 2;
+		}		
 		else {		
-			float x1 = nextNode->coordinates.x * GRIDSIZE;
-
-			al_draw_line(x1, y1, x2, y2, color, 1);
-			al_draw_filled_circle(progress * x1 / FINISHED + (FINISHED - progress) * x2 / FINISHED, progress * y1 / FINISHED + (FINISHED - progress) * y2 / FINISHED, 4, color);
+			x1 = nextNode->coordinates.x * GRIDSIZE;
 		}
 			
 	}
+	x = progress * x1 / FINISHED + (FINISHED - progress) * x2 / FINISHED;
+	y = progress * y1 / FINISHED + (FINISHED - progress) * y2 / FINISHED;
+	al_draw_filled_circle(x, y, 4, color);
 }
 
