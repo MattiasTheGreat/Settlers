@@ -69,3 +69,24 @@ Crossroad* Path::getPreviousNode(Crossroad* crossroad) {
 int Path::length() {
 	return path->size();
 }
+
+Travel_Direction Path::directionToCrossroad( Crossroad* current, Crossroad* goal) {
+	Travel_Direction direction = Travel_Direction::STARTWARD;
+	int stop = path->size();
+
+	for (int i = 0; i < stop; ++i) {
+		if (direction == Travel_Direction::STAY) {
+			direction = Travel_Direction::ENDWARD;
+		}
+
+		if (current == path->at(i)) {
+			direction = Travel_Direction::STAY;
+		}
+
+		if (goal == path->at(i)) {
+			return direction;
+		}
+	}
+
+	return Travel_Direction::UNREACHABLE;
+}

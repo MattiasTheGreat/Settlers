@@ -97,12 +97,12 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 					board->selected.x = -1;
 				}
 				else {
-					//TODO: Do we want to deselect here?
+					//TODO: Do we want to deselect here? A: Probably not. In cases we've started building a road, it would leave it with one end lose
 					fprintf(stderr, "Det gack int!\n");
 				}
 			}
 			else { // If we clicked a new node, try to build a path to the newly selected node and update currently selected node.
-				int pathLength = board->findPath(board->grid[board->selected.x][board->selected.y], board->grid[newClick.x][newClick.y], &paths, pathType); // Beware sideeffect: creating the road.
+				int pathLength = board->findPath(board->grid[board->selected.x][board->selected.y], board->grid[newClick.x][newClick.y], &paths, pathType); // Beware sideeffect: creating the road in paths.
 				if (pathLength != -1) {
 					board->selected = newClick;
 					if (!CURRENTLY_BUILDING_ROAD) {

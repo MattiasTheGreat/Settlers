@@ -33,7 +33,7 @@ public:
 	bool isGameRunning(); // Is used to turn of the game when the cross button in the window is pressed.
 	void setGameRunning(bool running);
 
-	// Give unto me an empty queue and i shall place in it a Path. Give unto me a Criteria to specify the Path thou Desire and that boon shalt be yours, should the place for it to exist be in this World. 
+	// Give unto me an empty queue and i shall place in it a Path. Give unto Me a Criteria to specify the Path thou Desire and that Boon shalt be yours, should the place for it to Exist be in this World. 
 	int findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType criteria);
 	
 	void buildRoad(std::queue<Crossroad*> path);
@@ -50,10 +50,9 @@ private:
 	std::vector<Carrier*>* carriers;
 
 	int aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossroad*, std::vector<Crossroad*>, test>* pathfinder, PathType criteria);
-	int breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType criteria);
 
-	//template <TraversibleEdge T>
-	//int breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType criteria);
+	template <class T> 
+	int breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType criteria);
 	bool running;
 };
 

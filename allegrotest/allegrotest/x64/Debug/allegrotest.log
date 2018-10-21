@@ -2,11 +2,6 @@
 c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\point2d.h(5): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
 c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\carrier.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\path.cpp(70): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-  InputHandler.cpp
-c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\point2d.h(5): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
-c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\carrier.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\inputhandler.cpp(149): warning C4477: 'fprintf' : format string '%i' requires an argument of type 'int', but variadic argument 4 has type 'Crossroad *'
-c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\inputhandler.cpp(149): warning C4313: 'fprintf': '%i' in format string conflicts with argument 4 of type 'Crossroad *'
-  Generating Code...
+c:\users\mattias\documents\github\settlers\allegrotest\allegrotest\path.cpp(75): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\x64\Debug\allegrotest.exe
   allegrotest.vcxproj -> C:\Users\Mattias\Documents\GitHub\Settlers\allegrotest\x64\Debug\allegrotest.pdb (Partial PDB)

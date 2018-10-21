@@ -156,6 +156,6 @@ void Crossroad::builtRoad(Directions dir) {
 	//stockPile->addCarrier(dir);
 }
 
-void builtRoad(Carrier* carrier) {
+void Crossroad::builtRoad(Carrier* carrier) {
 	carrier = carrier;
 }

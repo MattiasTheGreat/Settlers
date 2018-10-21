@@ -30,7 +30,7 @@ void Road::paintThySelf(int GRIDSIZE) {
 		color = al_map_rgb(0, 255, 0);
 	else
 		color = al_map_rgb(255,0,0);
-	if (start->coordinates.y % 2 == 1) {
+	if (start->shifted) {
 		if(end->shifted)
 			al_draw_line(start->coordinates.x * GRIDSIZE + GRIDSIZE / 2, start->coordinates.y * GRIDSIZE, end->coordinates.x * GRIDSIZE + GRIDSIZE / 2, end->coordinates.y * GRIDSIZE, color, 1);
 		else

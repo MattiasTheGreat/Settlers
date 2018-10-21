@@ -273,10 +273,10 @@ int Board::aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossr
 	}
 }
 
-/*
-template <TraversibleEdge T>
-int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType pathType) {
 
+template <class T>
+int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType pathType) {
+	static_assert(std::is_base_of_v<TraversibleNode, T>, "We're trying to traverse something that's not traversible"); // Please only do this with traversible stuff.
 
 	fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
 
@@ -323,63 +323,6 @@ int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType p
 				start->previous->pathing = true;
 		}
 		else
-			start->previous = NULL;
-
-		current->visited = false;
-		return returnvalue;
-	}
-}*/
-
-int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
-	/*system("pause"); //DEBUG
-	paintThySelf(30); //DEBUG
-	al_flip_display(); //DEBUG*/
-
-	fprintf(stderr, "distance %i \n", (int) (start->calculateDistance(end)));
-
-	if (start == end) {
-		while (!pathfinder->empty()) {
-			Crossroad* temp = pathfinder->front();
-			temp->visited = false;
-			temp->previous = NULL;
-
-			pathfinder->pop();
-		}
-		//start->previous = NULL;
-		start->previous->pathing = true;
-		return start->transportationCost();
-	}
-
-	else {
-		const Directions directions[6] = {NORTH_WEST, NORTH_EAST, EAST, SOUTH_EAST, SOUTH_WEST, WEST };
-		for (int i = 0; i < 6; ++i) {
-			Crossroad *node = start->getNeighbour(directions[i]);
-			if (pathCriteria(pathType, start->roads[i], end, node)) {
-				//fprintf(stderr, "E\n"); //DEBUG
-				//start->east->built = ROAD; //DEBUG
-				node->previous = start;
-				pathfinder->push(node);
-				node->visited = true;
-			}
-		}
-
-		if (pathfinder->empty()) {
-			return -1;
-		}
-
-		//paintThySelf(30); //DEBUG
-		//al_flip_display(); //DEGUB
-		Crossroad* current = pathfinder->front();
-		pathfinder->pop();
-
-		int returnvalue = breadthFirst(current, end, pathfinder, pathType);
-
-		if (start->pathing) {
-			start->pathing = false;
-			if(start->previous != NULL)
-				start->previous->pathing = true;
-		}
-		else 
 			start->previous = NULL;
 
 		current->visited = false;
@@ -451,7 +394,7 @@ void Board::paintThySelf(int GRIDSIZE) {
 	for (int x = 0; x < xSize; ++x) {
 		for (int y = 0; y < ySize; ++y) {
 
-			if ((x != xSize - 1 && x != 0 && y != ySize - 1)) {
+			if (x != xSize - 1 && x != 0 && y != ySize - 1) {
 				grid[x][y]->roads[Directions::EAST]->paintThySelf(GRIDSIZE);
 				grid[x][y]->roads[Directions::SOUTH_EAST]->paintThySelf(GRIDSIZE);
 				grid[x][y]->roads[Directions::SOUTH_WEST]->paintThySelf(GRIDSIZE);
