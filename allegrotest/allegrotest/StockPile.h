@@ -9,7 +9,7 @@ class Crossroad;
 enum Directions;
 
 
-class StockPile : TraversibleNode
+class StockPile 
 {
 public:
 	StockPile(Crossroad* crossroad);
@@ -22,11 +22,20 @@ public:
 	bool full; // True whenever there is no space left.
 	std::queue<Carrier*>* leaveItemQueue; //Carriers have to stand in line to leave an item. This is done through requestLeaveItem().
 	int numberOfItems;
+	StockPile* previous;
+	bool visited;
+	bool pathing;
 
 	bool requestLeaveOrder(Carrier* carrier); // The idea behind this being bool is if factories will inherit and if so enable them to reply false in cases where the wrong item type is being delivered.
 	Order *giveOrder(Carrier* pickUpNode);
 	void addCarrier(Directions dir, Carrier* carrier);
 	bool factory;
+
+	int transportationCost();
+
+	StockPile *getNeighbour(Directions direction);
+	Carrier *roadToNeighbour(StockPile* stockPile);
+	Directions getDirectionToNeighbour(StockPile* neighbour);
 
 	void createOrder(Order* order);
 

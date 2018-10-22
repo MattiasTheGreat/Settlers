@@ -16,7 +16,7 @@
 class Road;
 class StockPile;
 
-class Crossroad : TraversibleNode {
+class Crossroad  {
 public:
 	Crossroad();
 

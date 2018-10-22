@@ -8,13 +8,14 @@ class Crossroad;
 template <class T> class Path;
 class Order;
 
-class Carrier : public TraversibleEdge
+class Carrier 
 {
 public:
 	Carrier(Path<Crossroad*>* path);
 
 	
 
+	StockPile* getOpposite(StockPile* node);
 
 	void tick();
 	void moveTowardsGoal();
@@ -26,6 +27,8 @@ public:
 	void goToLocation(Crossroad* location);
 
 	void callForPickUp(StockPile* stockPile);
+
+
 	
 
 private:

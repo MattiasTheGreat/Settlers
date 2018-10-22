@@ -133,7 +133,11 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 					board->selected.x = -1;
 				}
 				else {
-					//int pathLength = board->breadthFirst(board->grid[board->selected.x][board->selected.y]->stockPile, board->grid[newClick.x][newClick.y]->stockPile, &paths, pathType); // Beware sideeffect: creating the road representation in paths.
+					int pathLength = board->findPath(board->grid[board->selected.x][board->selected.y]->stockPile, board->grid[newClick.x][newClick.y]->stockPile, &paths, pathType); // Beware sideeffect: creating the road representation in paths.
+					auto temp = new Path<StockPile*>;
+					temp->addToPath(paths, false);
+					Order* order = new Order(temp, new Item);
+					board->grid[newClick.x][newClick.y]->stockPile->createOrder(order);
 				}
 			}
 		}

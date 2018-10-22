@@ -26,6 +26,14 @@ Carrier::Carrier(Path<Crossroad*>* path)
 	direction = Travel_Direction::ENDWARD;
 	itemsAtEnd = 0;
 	itemsAtStart = 0;
+
+	Crossroad* startNeighbour = path->getNextNode(start);
+	Directions carrierIndex = start->getDirectionToNeighbour(startNeighbour);
+	start->stockPile->addCarrier(carrierIndex, this);
+
+	Crossroad* endNeighbour = path->getPreviousNode(end);
+	carrierIndex = end->getDirectionToNeighbour(startNeighbour);
+	end->stockPile->addCarrier(carrierIndex, this);
 }
 
 
@@ -46,9 +54,11 @@ void Carrier::takeOrder() {
 	}
 	else {
 		if (itemsAtEnd != 0) {
+			currentGoal = end;
 			direction = Travel_Direction::ENDWARD;
 		}
 		else if (itemsAtStart != 0) {
+			currentGoal = start;
 			direction = Travel_Direction::STARTWARD;
 		}
 		else {
@@ -102,7 +112,7 @@ void Carrier::advanceGoal() {
 		idle = true;
 	}
 
-	if (waiting & currentLocation == waitLocation) {
+	if (waiting && currentLocation == waitLocation) {
 		idle = true;
 	}
 	else if (currentLocation == currentGoal) {
@@ -122,19 +132,28 @@ void Carrier::goToLocation(Crossroad* location){ //TODO: Consider if we want to 
 	auto temp = path->directionToCrossroad(currentLocation, location);
 	if (direction == Travel_Direction::STAY) {
 		returning = true;
+		currentGoal = currentLocation;
 	}
 	else if (direction == Travel_Direction::UNREACHABLE) {
 		idle = true;
 	}
 	else {
 		direction = temp;
+		if (direction == Travel_Direction::ENDWARD) {
+			currentGoal = end;
+		}
+		else if (direction == Travel_Direction::STARTWARD) {
+			currentGoal = start;
+		}
 	}
 }
 
 void Carrier::callForPickUp(StockPile* stockPile) {
+	bool nothingToDo = waiting || idle;
 	idle = false;
 	waiting = false;
-	goToLocation(stockPile->location);
+	if(nothingToDo)
+		goToLocation(stockPile->location);
 	
 	if (stockPile == start->stockPile) {
 		++itemsAtStart;
@@ -143,6 +162,16 @@ void Carrier::callForPickUp(StockPile* stockPile) {
 		++itemsAtEnd;
 
 	}
+}
+
+StockPile* Carrier::getOpposite(StockPile* node) {
+	if (node->location == start) {
+		return end->stockPile;
+	}
+	else if (node->location == end) {
+		return start->stockPile;
+	}
+	return nullptr;
 }
 
 void Carrier::paintThySelf(int GRIDSIZE) {

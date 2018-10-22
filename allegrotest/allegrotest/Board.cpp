@@ -183,6 +183,11 @@ bool Board::pathCriteria(PathType type, Road* way, Crossroad* end, Crossroad* de
 	
 }
 
+bool Board::pathCriteria(PathType type, Carrier* way, StockPile* end, StockPile* destination) {
+	return !destination->visited;
+
+}
+
 
 
 int Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
@@ -218,10 +223,43 @@ int Board::findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pa
 
 }
 
+int Board::findPath(StockPile* start, StockPile* end, std::queue<StockPile*>* pathfinder, PathType pathType) {
+
+	if ((end->location->constructed == FREE || end->location->constructed == FLAG) && (start->location->constructed == FLAG || (start->location->constructed == ROAD && buildingRoad == true))) {
+
+		clock_t start_time = clock();
+		int return_value = breadthFirst(start, end, pathfinder, pathType);
+
+
+		/*
+		// for a-starish
+		std::priority_queue<Crossroad*, std::vector<Crossroad*>,test> priority;
+		int return_value = aStarish(start, end, &priority, pathType);
+		*/
+		fprintf(stderr, "ms %i \n", timeDiff_ms(start_time));
+		if (end->previous != NULL) {
+			StockPile* current = end;
+			while (current != start) {
+				pathfinder->push(current);
+				StockPile* temp = current->previous;
+				current->previous = NULL;
+				current = temp;
+			}
+			pathfinder->push(start);
+		}
+		return return_value;
+
+	}
+
+	else
+		return -1;
+
+}
+
 //Not tested since change to roads being a vector instead of six different variables.
 int Board::aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossroad*, std::vector<Crossroad*>, test>* pathfinder, PathType pathType) {
 
-	fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
+	//fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
 
 	if (start == end) { 
 		while (!pathfinder->empty()) {
@@ -273,11 +311,10 @@ int Board::aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossr
 	}
 }
 
-
-template <class T>
-int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType pathType) {
-	static_assert(std::is_base_of_v<TraversibleNode, T>, "We're trying to traverse something that's not traversible"); // Please only do this with traversible stuff.
-
+int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType pathType) {
+	
+	
+	
 	fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
 
 	if (start == end) {
@@ -296,7 +333,7 @@ int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType p
 	else {
 		const Directions directions[6] = { NORTH_WEST, NORTH_EAST, EAST, SOUTH_EAST, SOUTH_WEST, WEST };
 		for (int i = 0; i < 6; ++i) {
-			Crossroad *node = start->getNeighbour(directions[i]);
+			Crossroad* node = start->getNeighbour(directions[i]);
 			if (pathCriteria(pathType, start->roads[i], end, node)) {
 				//fprintf(stderr, "E\n"); //DEBUG
 				//start->east->built = ROAD; //DEBUG
@@ -329,6 +366,61 @@ int Board::breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType p
 		return returnvalue;
 	}
 }
+
+int Board::breadthFirst(StockPile* start, StockPile* end, std::queue<StockPile*>* pathfinder, PathType pathType) {
+
+	if (start == end) {
+		while (!pathfinder->empty()) {
+			StockPile* temp = pathfinder->front();
+			temp->visited = false;
+			temp->previous = NULL;
+
+			pathfinder->pop();
+		}
+		//start->previous = NULL;
+		start->previous->pathing = true;
+		return start->transportationCost();
+	}
+
+	else {
+		const Directions directions[6] = { NORTH_WEST, NORTH_EAST, EAST, SOUTH_EAST, SOUTH_WEST, WEST };
+		for (int i = 0; i < 6; ++i) {
+			if (start->carriers[directions[i]] != nullptr) {
+				StockPile* node = start->getNeighbour(directions[i]);
+				if (pathCriteria(pathType, start->carriers[i], end, node)) {
+					//fprintf(stderr, "E\n"); //DEBUG
+					//start->east->built = ROAD; //DEBUG
+					node->previous = start;
+					pathfinder->push(node);
+					node->visited = true;
+				}
+			}
+		}
+
+		if (pathfinder->empty()) {
+			return -1;
+		}
+
+		//paintThySelf(30); //DEBUG
+		//al_flip_display(); //DEGUB
+		StockPile* current = pathfinder->front();
+		pathfinder->pop();
+
+		int returnvalue = breadthFirst(current, end, pathfinder, pathType);
+
+		if (start->pathing) {
+			start->pathing = false;
+			if (start->previous != NULL)
+				start->previous->pathing = true;
+		}
+		else
+			start->previous = NULL;
+
+		current->visited = false;
+		return returnvalue;
+	}
+}
+
 
 void Board::buildRoad(std::queue<Crossroad*> path) {
 	if (!path.empty()) {

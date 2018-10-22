@@ -15,6 +15,8 @@ public:
 	bool visited;
 	TraversibleNode* previous;
 
+	virtual int transportationCost() = 0;
+
 	TraversibleEdge *roadToNeighbour(TraversibleNode* neighbour);
 	Directions getDirectionToNeighbour(TraversibleNode* neighbour);
 

@@ -3,6 +3,7 @@
 #include <vector>
 #include <vector>
 #include "Carrier.h"
+#include "StockPile.h"
 
 /*The different path types:
  *ROAD_PATH: Can only go through crossroads where nothing is built.
@@ -36,10 +37,12 @@ public:
 
 	// Give unto me an empty queue and i shall place in it a Path. Give unto Me a Criteria to specify the Path thou Desire and that Boon shalt be yours, should the place for it to Exist be in this World. 
 	int findPath(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType criteria);
+	int findPath(StockPile* start, StockPile* end, std::queue<StockPile*>* pathfinder, PathType pathType);
 	
 	void buildRoad(std::queue<Crossroad*> path);
 
 	bool pathCriteria(PathType type, Road* road, Crossroad* start, Crossroad* destination);
+	bool pathCriteria(PathType type, Carrier* road, StockPile* start, StockPile* destination);
 
 	void removeRoad(Crossroad* node);
 
@@ -48,8 +51,9 @@ public:
 	void tick(int GRIDSIZE);
 	void paintThySelf(int GRIDSIZE);
 
-	template <class T>
-	int breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType criteria);
+	
+	int breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>* pathfinder, PathType criteria);
+	int breadthFirst(StockPile* start, StockPile* end, std::queue<StockPile*>* pathfinder, PathType criteria);
 private:
 	std::vector<Carrier*>* carriers;
 

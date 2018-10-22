@@ -5,7 +5,7 @@
 
 class Crossroad;
 
-class Road : TraversibleEdge {
+class Road  {
 	friend class Crossroad;
 
 public:
