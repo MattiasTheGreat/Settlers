@@ -6,7 +6,7 @@
 
 
 
-Carrier::Carrier(Path* path)
+Carrier::Carrier(Path<Crossroad*>* path)
 {
 	this->path = path;
 	this->start = path->getStart();
@@ -17,32 +17,45 @@ Carrier::Carrier(Path* path)
 	//TODO: This is temp initialization parameters, should be changed later probably
 	currentLocation = start;
 	currentGoal = end;
-	waitLocation = end;
-	waiting = true;
+	waitLocation = path->middleNode();
+	waiting = false;
 	carrying = false;
 	progress = 1;
 	returning = false;
 	idle = false;
 	direction = Travel_Direction::ENDWARD;
+	itemsAtEnd = 0;
+	itemsAtStart = 0;
 }
 
 
 void Carrier::takeOrder() {
-	//order = currentGoal->stockPile->giveOrder(pickUpNode); //TODO: uncomment when order passing works
-	//if (order != NULL) {
-		//carrying = true;
+	order = currentGoal->stockPile->giveOrder(this); 
+	if (order != NULL) {
+		carrying = true;
 		if (currentGoal == start) {
+			--itemsAtStart;
 			currentGoal = end;
 			direction = Travel_Direction::ENDWARD;
 		}
 		else if (currentGoal == end) {
+			--itemsAtEnd;
 			currentGoal = start;
 			direction = Travel_Direction::STARTWARD;
 		}
-	/*}
+	}
 	else {
-		waiting = true;
-	}*/
+		if (itemsAtEnd != 0) {
+			direction = Travel_Direction::ENDWARD;
+		}
+		else if (itemsAtStart != 0) {
+			direction = Travel_Direction::STARTWARD;
+		}
+		else {
+			waiting = true;
+			goToLocation(waitLocation);
+		}
+	}
 }
 
 void Carrier::tick() {
@@ -52,13 +65,10 @@ void Carrier::tick() {
 }
 
 void Carrier::arrive() {
-	if (waiting) {
-
-	}
-	else if (carrying) {
+	if (carrying) {
 		currentGoal->stockPile->requestLeaveOrder(this);
 	}
-	else {
+	else { // If we're not carrying we don't need to wait until we've let go of the current order.
 		takeOrder();
 	}
 }
@@ -66,9 +76,6 @@ void Carrier::arrive() {
 void Carrier::moveTowardsGoal() {
 	if (progress == FINISHED || progress == 0) {
 		advanceGoal();
-		if (currentLocation == currentGoal) {
-			arrive();
-		}
 		progress = 1;
 	}
 	else {
@@ -84,9 +91,6 @@ void Carrier::moveTowardsGoal() {
 }
 
 void Carrier::advanceGoal() {
-	if (carrying){
-		order->moved(); // Might eventually not want to do this every advanceGoal depending on what path the order is keeping (Crossroads or Carriers).
-	}
 
 	if (direction == Travel_Direction::ENDWARD) {
 		currentLocation = path->getNextNode(currentLocation);
@@ -97,8 +101,13 @@ void Carrier::advanceGoal() {
 	else {
 		idle = true;
 	}
+
 	if (waiting & currentLocation == waitLocation) {
 		idle = true;
+	}
+	else if (currentLocation == currentGoal) {
+		arrive();
+		fprintf(stderr, "framme\n");
 	}
 }
 
@@ -109,24 +118,44 @@ Order* Carrier::giveOrder() {
 	return temp;
 }
 
-void Carrier::goToIdle(){ //TODO: Consider if we want to set currentGoal to waitLocation instead of this...
-	direction = path->directionToCrossroad(currentLocation, waitLocation);
-	if (direction = Travel_Direction::STAY) {
+void Carrier::goToLocation(Crossroad* location){ //TODO: Consider if we want to set currentGoal to waitLocation instead of this...
+	auto temp = path->directionToCrossroad(currentLocation, location);
+	if (direction == Travel_Direction::STAY) {
 		returning = true;
 	}
-	if (direction = Travel_Direction::UNREACHABLE) {
+	else if (direction == Travel_Direction::UNREACHABLE) {
 		idle = true;
+	}
+	else {
+		direction = temp;
+	}
+}
+
+void Carrier::callForPickUp(StockPile* stockPile) {
+	idle = false;
+	waiting = false;
+	goToLocation(stockPile->location);
+	
+	if (stockPile == start->stockPile) {
+		++itemsAtStart;
+	}
+	else if(stockPile == end->stockPile){
+		++itemsAtEnd;
+
 	}
 }
 
 void Carrier::paintThySelf(int GRIDSIZE) {
 	ALLEGRO_COLOR color = al_map_rgb(125, 125, 255);
+	if (carrying) {
+		color = al_map_rgb(128, 0, 64);
+	}
 	Crossroad* nextNode = currentLocation; //This is ugly, but will probably be fixed if i ever make a direction variable to solve all the currentGoal == end || start if-else things
 
-	if (currentGoal == end) {
+	if (direction == Travel_Direction::ENDWARD) {
 		nextNode = path->getNextNode(currentLocation);
 	}
-	else if (currentGoal == start) {
+	else if (direction == Travel_Direction::STARTWARD) {
 		nextNode = path->getPreviousNode(currentLocation);
 	}
 

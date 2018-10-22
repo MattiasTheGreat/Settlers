@@ -4,24 +4,29 @@
 #include <stack>
 #include "Directions.h"
 
+
+template <class T>
 class Path
 {
 public:
 	Path();
 	~Path();
 
-	Crossroad* getNode(int index);
-	Crossroad* getStart();
-	Crossroad* getEnd();
-	Crossroad* getNextNode(Crossroad* crossroad);
-	Crossroad* getPreviousNode(Crossroad* crossroad);
+	T getNode(int index);
+	T getStart();
+	T getEnd();
+	T getNextNode(T node);
+	T getPreviousNode(T node);
 	int length();
 	
 
-	void addToPath(std::queue<Crossroad*> appender, bool continueBuilding); // Destructive, so we want a copy of the parameter appender.
-	Travel_Direction directionToCrossroad(Crossroad* current, Crossroad* goal);
+	void addToPath(std::queue<T> appender, bool continueBuilding); // Destructive, so we want a copy of the parameter appender.
+	Travel_Direction directionToCrossroad(T current, T goal);
+	T middleNode();
 
 private:
-	std::vector<Crossroad*>* path;
+	std::vector<T>* path;
 };
 
+
+#include "Path.cpp"

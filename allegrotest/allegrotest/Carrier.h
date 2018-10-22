@@ -2,15 +2,16 @@
 #include "Item.h";
 #include "TraversibleEdge.h"
 #include "Directions.h"
+#include "StockPile.h"
 
 class Crossroad;
-class Path;
+template <class T> class Path;
 class Order;
 
-class Carrier : TraversibleEdge
+class Carrier : public TraversibleEdge
 {
 public:
-	Carrier(Path* path);
+	Carrier(Path<Crossroad*>* path);
 
 	
 
@@ -22,7 +23,9 @@ public:
 	void takeOrder();
 	Order* giveOrder(); // This function is never to be called from within the class. It is called by the crossroad when it is ready to take an item.
 	void paintThySelf(int GRIDSIZE);
-	void goToIdle();
+	void goToLocation(Crossroad* location);
+
+	void callForPickUp(StockPile* stockPile);
 	
 
 private:
@@ -32,7 +35,7 @@ private:
 	Crossroad* currentGoal;
 	Crossroad* currentLocation;
 	Crossroad* waitLocation;
-	Path* path;
+	Path<Crossroad*>* path;
 	Travel_Direction direction;
 
 	bool idle;
@@ -42,5 +45,7 @@ private:
 	int progress;
 	const int FINISHED = 30;
 	bool returning; // In case the carrier should turn around in the middle of two nodes.
+	int itemsAtStart;
+	int itemsAtEnd;
 };
 

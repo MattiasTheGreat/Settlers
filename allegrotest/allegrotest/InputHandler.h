@@ -4,7 +4,7 @@
 
 
 
-class Path;
+template <class T> class Path;
 class Board;
 class Crossroad;
 enum PathType; // Comes from board.h
@@ -20,7 +20,7 @@ public:
 	static ALLEGRO_EVENT_QUEUE *keyboard_event_queue;
 	static ALLEGRO_EVENT_QUEUE *display_event_queue;
 	static ALLEGRO_EVENT_QUEUE *mouse_event_queue;
-	static Path* currentPath;
+	static Path<Crossroad*>* currentPath;
 
 	static bool init(Board *board, int gridsize, ALLEGRO_DISPLAY *display);
 	static void handleInput();

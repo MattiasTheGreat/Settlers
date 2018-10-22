@@ -1,19 +1,22 @@
 #include "Path.h"
+#include "Crossroad.h"
 
 
-
-Path::Path()
+template <class T>
+Path<T>::Path()
 {
-	path = new std::vector<Crossroad*>;
+	path = new std::vector<T>;
 	
 }
 
-Path::~Path() {
+template <class T>
+Path<T>::~Path() {
 	delete path;
 }
 
-void Path::addToPath(std::queue<Crossroad*> appender, bool continueBuilding) {
-	std::stack<Crossroad*> intermediary = std::stack<Crossroad*>();
+template <class T>
+void Path<T>::addToPath(std::queue<T> appender, bool continueBuilding) {
+	std::stack<T> intermediary = std::stack<T>();
 
 	while (!appender.empty()) {
 		intermediary.push(appender.front());
@@ -21,7 +24,7 @@ void Path::addToPath(std::queue<Crossroad*> appender, bool continueBuilding) {
 	}
 
 	if(continueBuilding)
-		intermediary.pop(); //The pathbuilder always adds the start node which is already in the path as it was added as the ending node before, so we need to remove it as to not have it twice in a row. Might want to consider if appender should be vector
+		intermediary.pop(); //The pathbuilder always adds the start node which is already in the path as it was added as the ending node before, so we need to remove it as to not have it twice in a row. TODO: Might want to consider if appender should be vector
 
 	while(!intermediary.empty()){
 		path->push_back(intermediary.top());
@@ -29,23 +32,27 @@ void Path::addToPath(std::queue<Crossroad*> appender, bool continueBuilding) {
 	}
 }
 
-Crossroad* Path::getNode(int index) {
+template <class T>
+T Path<T>::getNode(int index) {
 	return path->at(index); // TODO: might want to make this access safer
 }
 
-Crossroad* Path::getStart() {
+template <class T>
+T Path<T>::getStart() {
 	return path->front();
 }
 
-Crossroad* Path::getEnd() {
+template <class T>
+T Path<T>::getEnd() {
 	return path->back();
 }
 
-Crossroad* Path::getNextNode(Crossroad* crossroad) {
+template <class T>
+T Path<T>::getNextNode(T node) {
 	for (int i = 0; i < path->size(); ++i) {
-		if (path->at(i) == crossroad) {
+		if (path->at(i) == node) {
 			if (i == path->size() - 1) {
-				return crossroad;
+				return node;
 			}
 			else
 				return path->at(i + 1);
@@ -53,11 +60,13 @@ Crossroad* Path::getNextNode(Crossroad* crossroad) {
 	}
 	return NULL;
 }
-Crossroad* Path::getPreviousNode(Crossroad* crossroad) {
+
+template <class T>
+T Path<T>::getPreviousNode(T node) {
 	for (int i = 0; i < path->size(); ++i) {
-		if (path->at(i) == crossroad) {
+		if (path->at(i) == node) {
 			if (i == 0) {
-				return crossroad;
+				return node;
 			}
 			else
 				return path->at(i - 1);
@@ -66,11 +75,13 @@ Crossroad* Path::getPreviousNode(Crossroad* crossroad) {
 	return NULL;
 }
 
-int Path::length() {
+template <class T>
+int Path<T>::length() {
 	return path->size();
 }
 
-Travel_Direction Path::directionToCrossroad( Crossroad* current, Crossroad* goal) {
+template <class T>
+Travel_Direction Path<T>::directionToCrossroad(T current, T goal) {
 	Travel_Direction direction = Travel_Direction::STARTWARD;
 	int stop = path->size();
 
@@ -90,3 +101,9 @@ Travel_Direction Path::directionToCrossroad( Crossroad* current, Crossroad* goal
 
 	return Travel_Direction::UNREACHABLE;
 }
+
+template <class T>
+T Path<T>::middleNode() {
+	return path->at(path->size() / 2);
+}
+

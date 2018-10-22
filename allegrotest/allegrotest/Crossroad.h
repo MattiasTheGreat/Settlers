@@ -38,7 +38,7 @@ public:
 	void printInfo();
 	
 	Crossroad *getNeighbour(Directions direction);
-	Road *roadToNeighbour(Crossroad*);
+	Road *roadToNeighbour(Crossroad* road);
 	Directions getDirectionToNeighbour(Crossroad* neighbour);
 
 	int transportationCost();

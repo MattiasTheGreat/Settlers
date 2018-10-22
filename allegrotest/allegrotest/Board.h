@@ -21,6 +21,7 @@ public:
 	int ySize;
 	Point2D mouse; // The node which is currently closest to the mouse. Will be highlighted.
 	Point2D selected; // The currently targeted crossroad on the map. Value of -1 means nothing targeted atm.
+	bool roadBuilding = true; // Temp variable to test item creating
 	
 	std::vector<std::vector<Crossroad*>> grid;
 
@@ -46,13 +47,15 @@ public:
 
 	void tick(int GRIDSIZE);
 	void paintThySelf(int GRIDSIZE);
+
+	template <class T>
+	int breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType criteria);
 private:
 	std::vector<Carrier*>* carriers;
 
 	int aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossroad*, std::vector<Crossroad*>, test>* pathfinder, PathType criteria);
 
-	template <class T> 
-	int breadthFirst(T* start, T* end, std::queue<T*>* pathfinder, PathType criteria);
+	
 	bool running;
 };
 

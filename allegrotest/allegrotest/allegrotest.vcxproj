@@ -133,7 +133,6 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Order.cpp" />
-    <ClCompile Include="Path.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="StockPile.cpp" />
     <ClCompile Include="TraversibleEdge.cpp" />

@@ -1,5 +1,6 @@
 #pragma once
 #include "Directions.h"
+#include <stdio.h>
 
 class TraversibleEdge;
 
@@ -14,6 +15,8 @@ public:
 	bool visited;
 	TraversibleNode* previous;
 
+	TraversibleEdge *roadToNeighbour(TraversibleNode* neighbour);
+	Directions getDirectionToNeighbour(TraversibleNode* neighbour);
 
 	TraversibleNode* getNeighbour(Directions dir);
 };

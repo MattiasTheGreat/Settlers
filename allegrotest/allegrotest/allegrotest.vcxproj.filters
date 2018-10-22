@@ -36,9 +36,6 @@
     <ClCompile Include="Carrier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Path.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Order.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

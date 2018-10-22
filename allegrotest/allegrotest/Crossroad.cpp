@@ -57,32 +57,8 @@ Directions Crossroad::getDirectionToNeighbour(Crossroad* neighbour) {
 	return EAST; // arbritrary. Should be fine, hopefully never gets here.
 }
 
-
-
 void Crossroad::name () {
 	fprintf(stderr, "Pos: (%i, %i) \n", this->coordinates.x, this->coordinates.y);
-}
-
-void Crossroad::paintThySelf(int GRIDSIZE) {
-	ALLEGRO_COLOR color;
-	if (pathing)
-		color = al_map_rgb(0, 0, 0);
-	else if (constructed == FREE)
-		color = al_map_rgb(0, 128, 128);
-	else if (constructed == BUILDING)
-		color = al_map_rgb(128, 128, 0);
-	else if (constructed == FLAG)
-		color = al_map_rgb(0, 255, 0);
-	else
-		color = al_map_rgb(255,0,0);
-	if (coordinates.y % 2 == 1)
-		al_draw_filled_circle(coordinates.x * GRIDSIZE + GRIDSIZE / 2, coordinates.y * GRIDSIZE, 4, color);
-	else
-		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
-
-	for (int i = 0; i < 8; ++i) {
-
-	}
 }
 
 
@@ -122,6 +98,9 @@ bool Crossroad::build(BuildStatus status) {
 				getNeighbour(Directions::NORTH_WEST)->constructed != FLAG &&
 				(constructed == FREE || constructed == FLAG || constructed == ROAD)) 
 			{
+				if (constructed == FLAG) {
+					stockPile->factory = true;
+				}
 				constructed = FLAG;
 				return true;
 			}
@@ -158,4 +137,28 @@ void Crossroad::builtRoad(Directions dir) {
 
 void Crossroad::builtRoad(Carrier* carrier) {
 	carrier = carrier;
+}
+
+void Crossroad::paintThySelf(int GRIDSIZE) {
+	ALLEGRO_COLOR color;
+	if (pathing)
+		color = al_map_rgb(0, 0, 0);
+	else if (constructed == FREE)
+		color = al_map_rgb(0, 128, 128);
+	else if (constructed == BUILDING)
+		color = al_map_rgb(128, 128, 0);
+	else if(stockPile->factory)
+		color = al_map_rgb(128,64, 0);
+	else if (constructed == FLAG)
+		color = al_map_rgb(0, 255, 0);
+	else
+		color = al_map_rgb(255, 0, 0);
+	if (coordinates.y % 2 == 1)
+		al_draw_filled_circle(coordinates.x * GRIDSIZE + GRIDSIZE / 2, coordinates.y * GRIDSIZE, 4, color);
+	else
+		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
+
+	for (int i = 0; i < 8; ++i) {
+
+	}
 }

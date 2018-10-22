@@ -2,11 +2,11 @@
 
 
 
-Order::Order(std::vector<Crossroad*> path, Item* item)
+Order::Order(Path<StockPile*>* path, Item* item)
 {
 	this->path = path;
 	this->item = item;
-	nextLocation = path.size() - 2; //2 because -1 would give the node its currently at. It should not be possible to create paths with a single element, in which case this is safe.
+	nextLocation = path->length() - 2; //2 because -1 would give the node its currently at. It should not be possible to create paths with a single element, in which case this is safe.
 }
 
 void Order::moved() {
@@ -18,8 +18,8 @@ void Order::removeStep()
 	nextLocation--;
 }
 
-Crossroad* Order::nextCrossroad() {
-	return path.at(nextLocation);
+StockPile* Order::nextStockPile() {
+	return path->getNode(nextLocation);
 }
 
 

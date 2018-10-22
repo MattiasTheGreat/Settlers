@@ -23,12 +23,15 @@ public:
 	std::queue<Carrier*>* leaveItemQueue; //Carriers have to stand in line to leave an item. This is done through requestLeaveItem().
 	int numberOfItems;
 
-	bool requestLeaveOrder(Carrier* carrier); //The idea behind this being bool is if factories will inherit and if so enable them to reply false in cases where the wrong item type is being delivered.
-	Order *giveOrder(Crossroad* pickUpNode);
+	bool requestLeaveOrder(Carrier* carrier); // The idea behind this being bool is if factories will inherit and if so enable them to reply false in cases where the wrong item type is being delivered.
+	Order *giveOrder(Carrier* pickUpNode);
 	void addCarrier(Directions dir, Carrier* carrier);
+	bool factory;
+
+	void createOrder(Order* order);
 
 private:
-	void getItem(); // This is called when an item is to be received from a carrier. Thus it is called on two occasions: when an item is taken from the crossroad (in case it was full), and when someone arrives with an item.
-
+	void takeItem(); // This is called when an item is to be received from a carrier. Thus it is called on two occasions: when an item is taken from the crossroad (in case it was full), and when someone arrives with an item.
+	void processOrder(Order* order);
 };
 

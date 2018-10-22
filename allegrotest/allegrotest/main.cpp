@@ -24,12 +24,15 @@
 /*TODO:
 Ongoing -------------------------------------------------------------------------------------------------------------
 
+
+
 Common pathfinders:
-	-TraversibleEdge and TraversibleNode now exists as baseclasses for pathfinding. Should be inherited by different levels of abstraction that we can pathfind on. Pathfinders doesnt' know of this yet though.
+	-TraversibleEdge and TraversibleNode now exists as baseclasses for pathfinding. Should be inherited by different levels of abstraction that we can pathfind on. Not sure if it works with Carriers and stockpiles yet
 
 Item passing:
 	-How to know which item to pick up at a crossroads. Currently based on previous node stuff, should be able to change to carrier. Feels more sound. ?= If there is no item to pick up giveItem in crossroads should return null.
 	-This us underway.
+	-Carriers might behave strangely when they go to pick up an item when having been idle. Probably only an issue one way depending on where the carrier came from. Might also not be a problem except that the carrier could "jump" two pixels when changing direction.
 
 When building a road and it goes to an existing flag it should change select as is done, but should finish the current road and create a carrier.
 
@@ -38,7 +41,7 @@ Eventuall improvements ---------------------------------------------------------
 For a-star we might wanna make a proper method of creating an optimistic estimation of distance. A bit hard in this kind-of-weird grid, but an interesting challenge. It's not manhattan distance since we have some diagonal shortcuts.
 
 Board is too broad, it does to much. Suggestions so far for refactoring are:
-	-The heuristics. The heuristics could be a class of its own, and the board only has a method to search given a heuristic.
+	-The heuristics. The heuristics could be a class of its own, and the board only has a method to search given a heuristic. Strategy pattern yeaaah.
 
 Expand the heuristics so that they can take a vector as goal, allowing for searching for the closest of a number of nodes.
 
