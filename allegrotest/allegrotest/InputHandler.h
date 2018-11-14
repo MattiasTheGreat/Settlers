@@ -2,7 +2,8 @@
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_primitives.h>
 
-
+extern int GRID_X_SIZE; // Value set in Crossroad.cpp
+extern int GRID_Y_SIZE; // Value set in Crossroad.cpp
 
 template <class T> class Path;
 class Board;

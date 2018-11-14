@@ -38,12 +38,13 @@ private:
 	Crossroad* currentGoal;
 	Crossroad* currentLocation;
 	Crossroad* waitLocation;
+	Crossroad* nextLocation; // Keeping track of the next location to move to allows us to display movement properly.
 	Path<Crossroad*>* path;
 	Travel_Direction direction;
 
-	bool idle;
+	bool idle; // When we have nothing to do and have reached the waitingNode this is true.
 	int length; // Meant to be used for A* pathfinding.
-	bool waiting;
+	bool waiting; // This is true when we have nothing to do.
 	bool carrying;
 	int progress;
 	const int FINISHED = 30;

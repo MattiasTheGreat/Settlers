@@ -1,6 +1,9 @@
 #include "Crossroad.h"
 #include "StockPile.h"
 
+int GRID_X_SIZE = 20;
+int GRID_Y_SIZE = 16; // Please make this an even number or no one knows what happens
+
 Crossroad::Crossroad() {
 	constructed = FREE;
 	visited = false;
@@ -62,8 +65,22 @@ void Crossroad::name () {
 }
 
 
-double Crossroad::calculateDistance(Crossroad* other) {
-	return sqrt(pow(this->coordinates.x - other->coordinates.x, 2) + pow(this->coordinates.y - other->coordinates.y, 2));
+int Crossroad::estimateDistance(Crossroad* other) {
+	int distanceX = std::abs(this->coordinates.x - other->coordinates.x);
+	if (distanceX > GRID_X_SIZE/2) {
+		distanceX = GRID_X_SIZE - distanceX;
+	}
+	int distanceY = std::abs(this->coordinates.y - other->coordinates.y);
+	if (distanceY > GRID_Y_SIZE/2) {
+		distanceY = GRID_Y_SIZE - distanceY;
+	}
+
+	// An optimal, straight road should at most be able to use a diagonal every other row 
+	// (and at best the one immidiately in the first row and the one in the last row, hence the +1).
+	int shortcut = (std::min(distanceX,distanceY)+1)/2 ;
+
+	// The total distance should be the two sides in a right triangle, with each diagonal used saving one unit of distance.
+	return distanceX + distanceY - shortcut;
 }
 
 
@@ -158,7 +175,4 @@ void Crossroad::paintThySelf(int GRIDSIZE) {
 	else
 		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
 
-	for (int i = 0; i < 8; ++i) {
-
-	}
 }

@@ -1,1 +1,6 @@
-﻿  allegrotest.vcxproj -> C:\Users\Mattias Evaldsson\Documents\GitHub\Settlers\allegrotest\x64\Debug\allegrotest.exe
+﻿  Crossroad.cpp
+c:\users\mattias evaldsson\documents\github\settlers\allegrotest\allegrotest\point2d.h(5): warning C4091: 'typedef ': ignored on left of 'Point2D' when no variable is declared
+c:\users\mattias evaldsson\documents\github\settlers\allegrotest\allegrotest\carrier.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\mattias evaldsson\documents\github\settlers\allegrotest\allegrotest\crossroad.cpp(146): warning C4477: 'fprintf' : format string '%i' requires an argument of type 'int', but variadic argument 1 has type 'double'
+c:\users\mattias evaldsson\documents\github\settlers\allegrotest\allegrotest\crossroad.cpp(146): warning C4477: 'fprintf' : format string '%i' requires an argument of type 'int', but variadic argument 2 has type 'double'
+  allegrotest.vcxproj -> C:\Users\Mattias Evaldsson\Documents\GitHub\Settlers\allegrotest\x64\Debug\allegrotest.exe

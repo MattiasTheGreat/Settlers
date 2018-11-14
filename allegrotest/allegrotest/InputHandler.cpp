@@ -77,7 +77,7 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 			board->selected = newClick;
 		}
 		else { //If a node was already selected
-			if (board->roadBuilding) {
+			if (board->roadBuilding) { //If we are creating items or building roads
 				std::queue<Crossroad*> paths;
 
 				bool SAME_NODE{ board->selected == newClick };
@@ -104,6 +104,7 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 				}
 				else { // If we clicked a new node, try to build a path to the newly selected node and update currently selected node.
 					int pathLength = board->findPath(board->grid[board->selected.x][board->selected.y], board->grid[newClick.x][newClick.y], &paths, pathType); // Beware sideeffect: creating the road representation in paths.
+					fprintf(stderr, "Estimated distance: %i\n", board->grid[board->selected.x][board->selected.y]->estimateDistance(board->grid[newClick.x][newClick.y]));
 					if (pathLength != -1) {
 						board->selected = newClick;
 						if (!CURRENTLY_BUILDING_ROAD) {
@@ -160,8 +161,8 @@ void InputHandler::handleKeyboard(ALLEGRO_EVENT event) {
 
 	if (event.keyboard.keycode == ALLEGRO_KEY_A && !onePulse) {
 		onePulse = true;
-		for (int x = 0; x < board->xSize; ++x)
-			for (int y = 0; y < board->ySize; ++y)
+		for (int x = 0; x < GRID_X_SIZE; ++x)
+			for (int y = 0; y < GRID_Y_SIZE; ++y)
 				fprintf(stderr, "%i %i %i %i\n", x, y, board->grid[x][y]->visited, board->grid[x][y]->previous);
 	}
 
@@ -181,8 +182,8 @@ void InputHandler::handleKeyboard(ALLEGRO_EVENT event) {
 		pathType = ITEM_PATH;
 
 	if (event.keyboard.keycode == ALLEGRO_KEY_R) {
-		for (int x = 0; x < board->xSize; ++x)
-			for (int y = 0; y < board->ySize; ++y) {
+		for (int x = 0; x < GRID_X_SIZE; ++x)
+			for (int y = 0; y < GRID_Y_SIZE; ++y) {
 				board->grid[x][y]->visited = false;
 				board->grid[x][y]->previous = NULL;
 			}

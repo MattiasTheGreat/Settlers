@@ -13,13 +13,15 @@
 enum PathType { ROAD_PATH, ITEM_PATH, FREE_PATH };
 struct test;
 
+extern int GRID_X_SIZE; // Value set in Crossroad.cpp
+extern int GRID_Y_SIZE; // Value set in Crossroad.cpp
+
+
 class Board {
 public:
-	Board(int xSize, int ySize);
+	Board();
 
 	bool buildingRoad;
-	int xSize;
-	int ySize;
 	Point2D mouse; // The node which is currently closest to the mouse. Will be highlighted.
 	Point2D selected; // The currently targeted crossroad on the map. Value of -1 means nothing targeted atm.
 	bool roadBuilding = true; // Temp variable to test item creating

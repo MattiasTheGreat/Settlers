@@ -9,21 +9,18 @@
 #include "Path.h"
 
 
-Board::Board(int xSize, int ySize) {
-	assert(ySize % 2 == 0);
+Board::Board() {
 
 	buildingRoad = false;
 	running = true;
 	mouse = { -1, -1 };
 	selected = { -1,-1 };
-	this->xSize = xSize;
-	this-> ySize = ySize;
 	carriers = new std::vector<Carrier*>;
 
-	for (int x = 0; x < xSize; ++x) {
+	for (int x = 0; x < GRID_X_SIZE; ++x) {
 		std::vector<Crossroad*> temp_vect = *(new std::vector<Crossroad*>);
 		
-		for (int y = 0; y < ySize; ++y) {
+		for (int y = 0; y < GRID_Y_SIZE; ++y) {
 			Crossroad* temp = (new Crossroad);
 			temp->coordinates.x = x;
 			temp->coordinates.y = y;
@@ -33,13 +30,13 @@ Board::Board(int xSize, int ySize) {
 		grid.push_back(temp_vect);
 	}
 	
-	for (int x = 0; x < xSize; ++x) {
-		for (int y = 0; y < ySize; ++y) {
+	for (int x = 0; x < GRID_X_SIZE; ++x) {
+		for (int y = 0; y < GRID_Y_SIZE; ++y) {
 
 			Road *roadEast = new Road;
 			grid[x][y]->roads[Directions::EAST] = roadEast;
 			roadEast->start = grid[x][y];
-			if (x == xSize - 1) {
+			if (x == GRID_X_SIZE - 1) {
 				roadEast->end = grid[0][y];
 				grid[0][y]->roads[Directions::WEST] = roadEast;
 			}
@@ -63,8 +60,8 @@ Board::Board(int xSize, int ySize) {
 				grid[x][y + 1]->roads[Directions::NORTH_WEST] = roadSouthEast;
 
 				if (x == 0) {
-					roadSouthWest->end = grid[xSize - 1][y + 1];
-					grid[xSize - 1][y + 1]->roads[Directions::NORTH_EAST] = roadSouthWest;
+					roadSouthWest->end = grid[GRID_X_SIZE - 1][y + 1];
+					grid[GRID_X_SIZE - 1][y + 1]->roads[Directions::NORTH_EAST] = roadSouthWest;
 				}
 				else {
 					roadSouthWest->end = grid[x - 1][y + 1];
@@ -73,12 +70,12 @@ Board::Board(int xSize, int ySize) {
 			}
 			else {
 				grid[x][y]->shifted = true;
-				if (y == ySize - 1) {
+				if (y == GRID_Y_SIZE - 1) {
 					roadSouthEast->end = grid[x][0];
 					grid[x][0]->roads[Directions::NORTH_WEST] = roadSouthEast;
 
 
-					if (x == xSize - 1) {
+					if (x == GRID_X_SIZE - 1) {
 						roadSouthWest->end = grid[0][0];
 						grid[0][0]->roads[Directions::NORTH_EAST] = roadSouthWest;
 					}
@@ -92,7 +89,7 @@ Board::Board(int xSize, int ySize) {
 					grid[x][y + 1]->roads[Directions::NORTH_WEST] = roadSouthEast;
 
 
-					if (x == xSize - 1) {
+					if (x == GRID_X_SIZE - 1) {
 						roadSouthWest->end = grid[0][y + 1];
 						grid[0][y + 1]->roads[Directions::NORTH_EAST] = roadSouthWest;
 					}
@@ -281,7 +278,7 @@ int Board::aStarish(Crossroad* start, Crossroad* end, std::priority_queue<Crossr
 
 			if (pathCriteria(pathType, start->roads[directions[i]], end, node)) {
 				node->previous = start;
-				node->distance = node->calculateDistance(end);
+				node->distance = node->estimateDistance(end);
 				pathfinder->push(node);
 				node->visited = true;
 			}
@@ -315,7 +312,7 @@ int Board::breadthFirst(Crossroad* start, Crossroad* end, std::queue<Crossroad*>
 	
 	
 	
-	fprintf(stderr, "distance %i \n", (int)(start->calculateDistance(end)));
+	fprintf(stderr, "distance %i \n", start->estimateDistance(end));
 
 	if (start == end) {
 		while (!pathfinder->empty()) {
@@ -483,10 +480,10 @@ void Board::tick(int GRIDSIZE) {
 
 void Board::paintThySelf(int GRIDSIZE) {
 	al_clear_to_color(al_map_rgb(0, 0, 0));
-	for (int x = 0; x < xSize; ++x) {
-		for (int y = 0; y < ySize; ++y) {
+	for (int x = 0; x < GRID_X_SIZE; ++x) {
+		for (int y = 0; y < GRID_Y_SIZE; ++y) {
 
-			if (x != xSize - 1 && x != 0 && y != ySize - 1) {
+			if (x != GRID_X_SIZE - 1 && x != 0 && y != GRID_Y_SIZE - 1) {
 				grid[x][y]->roads[Directions::EAST]->paintThySelf(GRIDSIZE);
 				grid[x][y]->roads[Directions::SOUTH_EAST]->paintThySelf(GRIDSIZE);
 				grid[x][y]->roads[Directions::SOUTH_WEST]->paintThySelf(GRIDSIZE);

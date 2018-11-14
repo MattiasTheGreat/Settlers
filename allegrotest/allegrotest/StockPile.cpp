@@ -66,24 +66,37 @@ void StockPile::takeItem() {
 	Order* order = leaveItemQueue->front()->giveOrder();
 	leaveItemQueue->pop();
 	processOrder(order);
-	for (int i = 0; i < 8; ++i) {
-		if (!space[i]) {
-			orders[i] = order;
-			space[i] = true;
-			numberOfItems++;
-			if (numberOfItems == 8) {
-				full = true;
-			}
-			break;
-		}
-	}
+	
 }
 
 void StockPile::processOrder(Order* order) {
 	order->moved();
-	if (!factory) {
-		((Carrier*)roadToNeighbour(order->nextStockPile()))->callForPickUp(this);
+	StockPile* nextStockPile = order->nextStockPile();
+	if (nextStockPile != nullptr) {
+		((Carrier*)roadToNeighbour(nextStockPile))->callForPickUp(this);
+		for (int i = 0; i < 8; ++i) {
+			if (!space[i]) {
+				orders[i] = order;
+				space[i] = true;
+				numberOfItems++;
+				if (numberOfItems == 8) {
+					full = true;
+				}
+				break;
+			}
+		}
 	}
+	else {
+		giveFactoryOrder(order);
+	}
+
+}
+
+void StockPile::giveFactoryOrder(Order* order) {
+	if (!factory) {
+		fprintf(stderr, "End goal of order was not factory");
+	}
+	delete order;
 }
 
 void StockPile::addCarrier(Directions dir, Carrier* carrier) {
@@ -92,8 +105,8 @@ void StockPile::addCarrier(Directions dir, Carrier* carrier) {
 
 void StockPile::createOrder(Order* order) {
 	auto nextPile = order->nextStockPile();
-	auto road = roadToNeighbour(nextPile);
-	road->callForPickUp(this);
+	auto carrier = roadToNeighbour(nextPile);
+	carrier->callForPickUp(this);
 	for (int i = 0; i < 8; ++i) {
 		if (!space[i]) {
 			orders[i] = order;

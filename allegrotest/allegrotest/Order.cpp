@@ -19,7 +19,12 @@ void Order::removeStep()
 }
 
 StockPile* Order::nextStockPile() {
-	return path->getNode(nextLocation);
+	if (nextLocation >= 0) {
+		return path->getNode(nextLocation);
+	}
+	else {
+		return nullptr;
+	}
 }
 
 

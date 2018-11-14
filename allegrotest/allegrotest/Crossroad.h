@@ -7,7 +7,6 @@
 #include "Road.h"
 #include <stdio.h>
 #include <allegro5/allegro_primitives.h>
-#include <math.h>
 #include "Carrier.h"
 #include <queue>
 #include "Order.h"
@@ -15,6 +14,8 @@
 
 class Road;
 class StockPile;
+
+
 
 class Crossroad  {
 public:
@@ -42,7 +43,7 @@ public:
 	Directions getDirectionToNeighbour(Crossroad* neighbour);
 
 	int transportationCost();
-	double calculateDistance(Crossroad* other);
+	int estimateDistance(Crossroad* other);
 
 	bool build(BuildStatus status);
 	void paintThySelf(int GRIDSIZE);

@@ -42,5 +42,6 @@ public:
 private:
 	void takeItem(); // This is called when an item is to be received from a carrier. Thus it is called on two occasions: when an item is taken from the crossroad (in case it was full), and when someone arrives with an item.
 	void processOrder(Order* order);
+	void giveFactoryOrder(Order* order);
 };
 

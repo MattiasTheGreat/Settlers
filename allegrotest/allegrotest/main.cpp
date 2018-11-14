@@ -27,14 +27,12 @@ Ongoing ------------------------------------------------------------------------
 
 
 Common pathfinders:
-	-TraversibleEdge and TraversibleNode now exists as baseclasses for pathfinding. Should be inherited by different levels of abstraction that we can pathfind on. Not sure if it works with Carriers and stockpiles yet
+	-TraversibleEdge and TraversibleNode now exists as baseclasses for pathfinding. Should be inherited by different levels of abstraction that we can pathfind on. 
+	 Requires a refactoring of pathCriteria handler first though. Might wanna create the pathfinder class first.
 
 Item passing:
-	-How to know which item to pick up at a crossroads. Currently based on previous node stuff, should be able to change to carrier. Feels more sound. ?= If there is no item to pick up giveItem in crossroads should return null.
-	-This us underway.
+	-If there is no item to pick up giveItem in crossroads should return null?
 	-Carriers might behave strangely when they go to pick up an item when having been idle. Probably only an issue one way depending on where the carrier came from. Might also not be a problem except that the carrier could "jump" two pixels when changing direction.
-
-When building a road and it goes to an existing flag it should change select as is done, but should finish the current road and create a carrier.
 
 Eventuall improvements ----------------------------------------------------------------------------------------------
 
@@ -104,19 +102,19 @@ int main(int argc, char **argv) {
 	const int GRIDSIZE = 30;
 	const int YSIZE = 16; //jämnt tal!
 	const int XSIZE = 20;
-	Board board(XSIZE,YSIZE);
+	Board* board = new Board();
 
-	if (!InputHandler::init(&board, GRIDSIZE, display)) {
+	if (!InputHandler::init(board, GRIDSIZE, display)) {
 		al_destroy_display(display);
 		return -1;
 	}
 
 	clock_t previous_time = clock();
-	while (board.isGameRunning()){
+	while (board->isGameRunning()){
 		//Only update the screen at 60 fps.
 		if ( (1000 * (clock() - previous_time)) / CLOCKS_PER_SEC > 60) {
 			previous_time = clock();
-			board.tick(GRIDSIZE);
+			board->tick(GRIDSIZE);
 		}
 		InputHandler::handleInput();
 		al_flip_display();

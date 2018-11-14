@@ -95,6 +95,9 @@
     <ClInclude Include="TraversibleNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GridSize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
