@@ -8,8 +8,9 @@ enum itemType {NULLITEM,TREE,PLANKS};
 
 class Item {
 public:
-	Item();
+	Item(ALLEGRO_COLOR color);
 	itemType type;
+	ALLEGRO_COLOR color;
 
-	void paintThyself(int GRIDSIZE, Point2D coordinates);
+	void paintThyself(Point2D coordinates);
 };

@@ -4,8 +4,7 @@
 
 
 
-StockPile::StockPile(Crossroad* crossroad)
-{
+StockPile::StockPile(Crossroad* crossroad){
 	for (int i = 0; i < 8; i++) {
 		orders[i] = nullptr;
 		space[i] = false;
@@ -23,8 +22,7 @@ StockPile::StockPile(Crossroad* crossroad)
 }
 
 
-StockPile::~StockPile()
-{
+StockPile::~StockPile(){
 	delete leaveItemQueue;
 }
 
@@ -34,10 +32,34 @@ int StockPile::transportationCost() {
 
 bool StockPile::requestLeaveOrder(Carrier* carrier) {
 	leaveItemQueue->push(carrier);
+	fprintf(stderr, "waiting carriers: %i\n", leaveItemQueue->size());
 	if (!full) {
-		takeItem();		
+		takeItem();
 	}
+	
 	return true;
+}
+
+Order* StockPile::exchangeOrder(Carrier* carrier, Order* order) {
+	order->moved();
+	Order* oldOrder = nullptr;
+	StockPile* newOrderNeighbor = carrier->getOpposite(this);
+	for (int i = 0; i < 8; ++i) {
+		StockPile* oldOrderNext = (space[i] ? orders[i]->nextStockPile() : nullptr);
+		if (space[i] && oldOrderNext == newOrderNeighbor) {
+			oldOrder = orders[i];
+			if (order->nextStockPile() != nullptr) {
+				orders[i] = order;
+				((Carrier*)roadToNeighbour(order->nextStockPile()))->callForPickUp(this); //This is wrong
+			}
+			else {
+				space[i] = false;
+				giveFactoryOrder(order);
+			}
+			break;
+		}
+	}
+	return oldOrder;
 }
 
 Order *StockPile::giveOrder(Carrier* carrier) {
@@ -53,8 +75,8 @@ Order *StockPile::giveOrder(Carrier* carrier) {
 
 			if (leaveItemQueue->size() != 0) { // This should take care of any queue that might have built up while we were full.
 				takeItem();
-			}
-			full = false;
+			}else
+				full = false;
 			break;
 		}
 	}
@@ -63,8 +85,10 @@ Order *StockPile::giveOrder(Carrier* carrier) {
 }
 
 void StockPile::takeItem() {
-	Order* order = leaveItemQueue->front()->giveOrder();
+	Carrier* carrier = leaveItemQueue->front();
 	leaveItemQueue->pop();
+	fprintf(stderr, "After popping, waiting carriers: %i\n", leaveItemQueue->size());
+	Order* order = carrier->dropOffOrder(); 
 	processOrder(order);
 	
 }
@@ -94,7 +118,7 @@ void StockPile::processOrder(Order* order) {
 
 void StockPile::giveFactoryOrder(Order* order) {
 	if (!factory) {
-		fprintf(stderr, "End goal of order was not factory");
+		fprintf(stderr, "End goal of order was not factory\n");
 	}
 	delete order;
 }
@@ -175,4 +199,13 @@ Directions StockPile::getDirectionToNeighbour(StockPile* neighbour) {
 	return EAST; // arbritrary. Should be fine, hopefully never gets here.
 }
 
-
+void StockPile::paintThySelf(Point2D location) {
+	int counter = 1;
+	for (int i = 0; i < 8; ++i) {
+		if (space[i]) {
+			Point2D newLocation{location.x, location.y - 4 * counter};
+			orders[i]->item->paintThyself(newLocation);
+			counter++;
+		}
+	}
+}

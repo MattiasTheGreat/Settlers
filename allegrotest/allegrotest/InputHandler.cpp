@@ -16,6 +16,8 @@ ALLEGRO_EVENT_QUEUE *InputHandler::display_event_queue;
 ALLEGRO_EVENT_QUEUE *InputHandler::mouse_event_queue;
 Path<Crossroad*>* InputHandler::currentPath;
 
+int InputHandler::itemColor;
+
 bool InputHandler::init(Board *gameBoard, int gridsize, ALLEGRO_DISPLAY *display) {
 	InputHandler::board = gameBoard;
 	InputHandler::GRIDSIZE = gridsize;
@@ -47,6 +49,8 @@ bool InputHandler::init(Board *gameBoard, int gridsize, ALLEGRO_DISPLAY *display
 	al_register_event_source(display_event_queue, al_get_display_event_source(display));
 	al_register_event_source(keyboard_event_queue, al_get_keyboard_event_source());
 	al_register_event_source(mouse_event_queue, al_get_mouse_event_source());
+
+	itemColor = 0;
 	return true;
 }
 
@@ -137,7 +141,8 @@ void InputHandler::handleMouse(ALLEGRO_EVENT event) {
 					int pathLength = board->findPath(board->grid[board->selected.x][board->selected.y]->stockPile, board->grid[newClick.x][newClick.y]->stockPile, &paths, pathType); // Beware sideeffect: creating the road representation in paths.
 					auto temp = new Path<StockPile*>;
 					temp->addToPath(paths, false);
-					Order* order = new Order(temp, new Item);
+					itemColor++;
+					Order* order = new Order(temp, new Item(al_map_rgb(itemColor, itemColor * 40, itemColor * 40)));
 					board->grid[newClick.x][newClick.y]->stockPile->createOrder(order);
 				}
 			}
@@ -171,6 +176,9 @@ void InputHandler::handleKeyboard(ALLEGRO_EVENT event) {
 
 	if (event.keyboard.keycode == ALLEGRO_KEY_I)
 		board->roadBuilding= !board->roadBuilding;
+
+	if (event.keyboard.keycode == ALLEGRO_KEY_C)
+		itemColor += 40;
 
 	if (event.keyboard.keycode == ALLEGRO_KEY_Q)
 		pathType = ROAD_PATH;

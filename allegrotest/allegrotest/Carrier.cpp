@@ -14,15 +14,14 @@ Carrier::Carrier(Path<Crossroad*>* path)
 	nextLocation = path->getNextNode(start);
 	order = NULL;
 	length = path->length();
+	state = WAITING;
 
 	waitLocation = path->middleNode();
 	currentLocation = start;
 	currentGoal = waitLocation;
-	waiting = true;
 	carrying = false;
 	progress = 0;
 	returning = false;
-	idle = false;
 	direction = Travel_Direction::ENDWARD;
 	itemsAtEnd = 0;
 	itemsAtStart = 0;
@@ -38,9 +37,15 @@ Carrier::Carrier(Path<Crossroad*>* path)
 
 
 void Carrier::takeOrder() {
-	order = currentGoal->stockPile->giveOrder(this); 
+	order = currentGoal->stockPile->giveOrder(this);
+	
+	turnToOtherGoal();
+}
+
+void Carrier::turnToOtherGoal() {
 	Crossroad* next = waitLocation;
-	bool temp = false;
+	state = WALKING;
+	bool startWaiting = false;
 	if (order != NULL) {
 		carrying = true;
 		if (currentGoal == start) {
@@ -60,24 +65,31 @@ void Carrier::takeOrder() {
 			next = start;
 		}
 		else {
-			temp = true;
+			startWaiting = true;
 		}
 	}
 	goToLocation(next);
-	if (temp) {
-		waiting = true;
+	if (startWaiting) {
+		state = WAITING;
 	}
 }
 
 void Carrier::tick() {
-	if (!idle) {
+	if (state != IDLE && state != DROPPING_OFF_ITEM) {
 		moveTowardsGoal();
 	}
 }
 
 void Carrier::arrive() {
 	if (carrying) {
-		currentGoal->stockPile->requestLeaveOrder(this);
+		if (pickingUpItemAt(currentGoal)) {
+			order = currentGoal->stockPile->exchangeOrder(this, order);
+			turnToOtherGoal();
+		}
+		else {
+			state = DROPPING_OFF_ITEM;
+			currentGoal->stockPile->requestLeaveOrder(this);
+		}
 	}
 	else { // If we're not carrying we don't need to wait until we've let go of the current order. 
 		takeOrder();
@@ -115,76 +127,86 @@ void Carrier::advanceGoal() {
 		if (returning) {
 			returning = false;
 		}
-		else{
+		else {
 			currentLocation = path->getPreviousNode(currentLocation);
 		}
 		nextLocation = path->getPreviousNode(currentLocation);
 	}
 	else if (direction == Travel_Direction::STAY) {
-		
+
 	}
 	else
-		idle = true;
+		state = IDLE;
 	
 	returning = false;
 
-	if (waiting && currentLocation == waitLocation) {
-		idle = true;
+	if (state == WAITING && currentLocation == waitLocation) {
+		state = IDLE;
 	}
 	else if (currentLocation == currentGoal) {
+		arrive();
 	}
 }
 
-Order* Carrier::giveOrder() {
+Order* Carrier::dropOffOrder() { //TODO (Bug): I only suspect it is here, but somewhere we need to check if we can exchange an item when having been in the waiting to leave item queue. Could also do it in requestPickUp.
 	carrying = false;
 	auto temp = order;
-	takeOrder();
+	order = nullptr;
+	turnToOtherGoal();
 	return temp;
 }
 
 void Carrier::goToLocation(Crossroad* location){ // TODO: Consider if we want to set currentGoal to waitLocation instead of this. Probably doesn't work in all cases though, so might be an obsolete comment
-	auto temp = path->directionToCrossroad(currentLocation, location);
-	if (temp == Travel_Direction::UNREACHABLE) {
-		idle = true;
+	auto newDirection = path->directionToCrossroad(currentLocation, location);
+	if (newDirection == Travel_Direction::UNREACHABLE) {
+		state = IDLE;
 	}
 	else {
 		currentGoal = location;
-		if (temp == Travel_Direction::STAY) {
+		if (newDirection == Travel_Direction::STAY) {
+			
 			returning = true;
 		}
 		else {
-			if (waiting) {
-				if (direction != temp) {
+			if (state == WAITING) {
+				if (direction != newDirection) {
 					returning = true;
 				}
 			}
-			else if (temp == Travel_Direction::ENDWARD) {
+			else if (newDirection == Travel_Direction::ENDWARD) {
 				nextLocation = path->getNextNode(currentLocation);
 			}
-			else if (temp== Travel_Direction::STARTWARD) {
+			else if (newDirection== Travel_Direction::STARTWARD) {
 				nextLocation = path->getPreviousNode(currentLocation);
 			}
 		}
+		state = WALKING;
 	}
-	direction = temp;
+	direction = newDirection;
 }
 
 void Carrier::callForPickUp(StockPile* stockPile) {
-	bool nothingToDo = waiting || idle;
+	bool nothingToDo = (state == WAITING || state == IDLE);
 	
 	if(nothingToDo)
 		goToLocation(stockPile->location);
-	
-	idle = false;
-	waiting = false;
 
 	if (stockPile == start->stockPile) {
 		++itemsAtStart;
 	}
 	else if(stockPile == end->stockPile){
 		++itemsAtEnd;
-
 	}
+}
+
+bool Carrier::pickingUpItemAt(Crossroad* crossroad) {
+	if (crossroad == end) {
+		return itemsAtEnd > 0;
+	}
+	else if(crossroad == start) {
+		return itemsAtStart > 0;
+	}
+	return false;
 }
 
 StockPile* Carrier::getOpposite(StockPile* node) {
@@ -233,5 +255,9 @@ void Carrier::paintThySelf(int GRIDSIZE) {
 	x = progress * x1 / FINISHED + (FINISHED - progress) * x2 / FINISHED;
 	y = progress * y1 / FINISHED + (FINISHED - progress) * y2 / FINISHED;
 	al_draw_filled_circle(x, y, 4, color);
+
+	Point2D temp{ x,y - 4 };
+	if(carrying)
+		order->item->paintThyself(temp);
 }
 

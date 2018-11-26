@@ -21,7 +21,7 @@ Board::Board() {
 		std::vector<Crossroad*> temp_vect = *(new std::vector<Crossroad*>);
 		
 		for (int y = 0; y < GRID_Y_SIZE; ++y) {
-			Crossroad* temp = (new Crossroad);
+			Crossroad* temp = new Crossroad;
 			temp->coordinates.x = x;
 			temp->coordinates.y = y;
 			temp_vect.push_back(temp);
@@ -44,8 +44,8 @@ Board::Board() {
 				roadEast->end = grid[x + 1][y];
 				grid[x + 1][y]->roads[Directions::WEST] = roadEast;
 			}
-			if (rand() % 5 == 0)
-				grid[x][y]->constructed = BUILDING;
+			/*if (rand() % 5 == 0)
+				grid[x][y]->constructed = BUILDING;*/ //Doesn't initialize rand so it's the same everytime -.-'
 			
 			Road *roadSouthEast = new Road;
 			Road *roadSouthWest = new Road;

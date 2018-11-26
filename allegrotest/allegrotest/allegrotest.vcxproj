@@ -145,7 +145,6 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="Directions.h" />
     <ClInclude Include="fpsCounter.h" />
-    <ClInclude Include="GridSize.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Order.h" />

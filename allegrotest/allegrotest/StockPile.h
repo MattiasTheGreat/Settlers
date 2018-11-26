@@ -1,6 +1,7 @@
 #pragma once
 #include <queue>
 #include "TraversibleNode.h"
+#include "Point2D.h"
 
 
 class Carrier;
@@ -27,7 +28,8 @@ public:
 	bool pathing;
 
 	bool requestLeaveOrder(Carrier* carrier); // The idea behind this being bool is if factories will inherit and if so enable them to reply false in cases where the wrong item type is being delivered.
-	Order *giveOrder(Carrier* pickUpNode);
+	Order* giveOrder(Carrier* pickUpNode);
+	Order* exchangeOrder(Carrier* carrier, Order* order);
 	void addCarrier(Directions dir, Carrier* carrier);
 	bool factory;
 
@@ -38,6 +40,8 @@ public:
 	Directions getDirectionToNeighbour(StockPile* neighbour);
 
 	void createOrder(Order* order);
+
+	void paintThySelf(Point2D location);
 
 private:
 	void takeItem(); // This is called when an item is to be received from a carrier. Thus it is called on two occasions: when an item is taken from the crossroad (in case it was full), and when someone arrives with an item.

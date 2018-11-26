@@ -23,7 +23,9 @@
 
 /*TODO:
 Ongoing -------------------------------------------------------------------------------------------------------------
-
+Item passing bugs:
+	-Occasionaly crashes weirdly when passing items.
+	-When waiting to drop item at stockpile carriers are considered idle. If they get a callToPickUp at such a time they will go pick it up.
 
 
 Common pathfinders:
@@ -35,8 +37,6 @@ Item passing:
 	-Carriers might behave strangely when they go to pick up an item when having been idle. Probably only an issue one way depending on where the carrier came from. Might also not be a problem except that the carrier could "jump" two pixels when changing direction.
 
 Eventuall improvements ----------------------------------------------------------------------------------------------
-
-For a-star we might wanna make a proper method of creating an optimistic estimation of distance. A bit hard in this kind-of-weird grid, but an interesting challenge. It's not manhattan distance since we have some diagonal shortcuts.
 
 Board is too broad, it does to much. Suggestions so far for refactoring are:
 	-The heuristics. The heuristics could be a class of its own, and the board only has a method to search given a heuristic. Strategy pattern yeaaah.

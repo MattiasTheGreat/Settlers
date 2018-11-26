@@ -23,6 +23,8 @@ public:
 	static ALLEGRO_EVENT_QUEUE *mouse_event_queue;
 	static Path<Crossroad*>* currentPath;
 
+	static int itemColor;
+
 	static bool init(Board *board, int gridsize, ALLEGRO_DISPLAY *display);
 	static void handleInput();
 

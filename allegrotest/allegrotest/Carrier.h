@@ -8,6 +8,12 @@ class Crossroad;
 template <class T> class Path;
 class Order;
 
+enum CarrierState {	WAITING, // We have no tasks to do and are not carrying, but have yet to return to the waitLocation.
+					DROPPING_OFF_ITEM, //We are waiting to drop off an item.
+					IDLE, //We have nothing to do and are at the waitLocation.
+					WALKING //We have stuff to do and are going somewhere.
+};
+
 class Carrier 
 {
 public:
@@ -22,13 +28,15 @@ public:
 	void advanceGoal();
 	void arrive();
 	void takeOrder();
-	Order* giveOrder(); // This function is never to be called from within the class. It is called by the crossroad when it is ready to take an item.
+	Order* dropOffOrder(); // This function is never to be called from within the class. It is called by the crossroad when it is ready to take an item.
 	void paintThySelf(int GRIDSIZE);
 	void goToLocation(Crossroad* location);
 
+	void turnToOtherGoal();
+
 	void callForPickUp(StockPile* stockPile);
 
-
+	bool pickingUpItemAt(Crossroad* crossroad);
 	
 
 private:
@@ -42,9 +50,8 @@ private:
 	Path<Crossroad*>* path;
 	Travel_Direction direction;
 
-	bool idle; // When we have nothing to do and have reached the waitingNode this is true.
+	CarrierState state;
 	int length; // Meant to be used for A* pathfinding.
-	bool waiting; // This is true when we have nothing to do.
 	bool carrying;
 	int progress;
 	const int FINISHED = 30;

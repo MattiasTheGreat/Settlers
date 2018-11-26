@@ -158,6 +158,8 @@ void Crossroad::builtRoad(Carrier* carrier) {
 
 void Crossroad::paintThySelf(int GRIDSIZE) {
 	ALLEGRO_COLOR color;
+	int x = coordinates.x * GRIDSIZE;
+	int y = coordinates.y * GRIDSIZE;
 	if (pathing)
 		color = al_map_rgb(0, 0, 0);
 	else if (constructed == FREE)
@@ -170,9 +172,11 @@ void Crossroad::paintThySelf(int GRIDSIZE) {
 		color = al_map_rgb(0, 255, 0);
 	else
 		color = al_map_rgb(255, 0, 0);
-	if (coordinates.y % 2 == 1)
-		al_draw_filled_circle(coordinates.x * GRIDSIZE + GRIDSIZE / 2, coordinates.y * GRIDSIZE, 4, color);
-	else
-		al_draw_filled_circle(coordinates.x * GRIDSIZE, coordinates.y * GRIDSIZE, 4, color);
+	if (coordinates.y % 2 == 1) {
+		x += GRIDSIZE / 2;
+	}
 
+	al_draw_filled_circle(x, y, 4, color);
+	Point2D temp{ x, y };
+	stockPile->paintThySelf(temp);
 }
